@@ -4,6 +4,7 @@ import { createFilmsContainerTemplate } from './view/films.js';
 import { createFilmsExtraContainerTemplate } from './view/films-extra.js';
 import { createCardTemplate } from './view/card.js';
 import { createShowMoreButtonTemplate } from './view/show-more-button.js';
+import { createPopupTemplate } from './view/popup.js';
 
 const MAIN_MOVIE_COUNT = 5;
 const EXTRA_MOVIE_COUNT = 2;
@@ -44,3 +45,6 @@ const siteFilmsMostCommentedListElement = siteFilmsMostCommentedElement.querySel
 for (let i = 0; i < EXTRA_MOVIE_COUNT; i++) {
   render(siteFilmsMostCommentedListElement, createCardTemplate(), 'beforeend');
 }
+
+const siteBodyElement = document.body;
+render(siteBodyElement, createPopupTemplate(), 'beforeend');
