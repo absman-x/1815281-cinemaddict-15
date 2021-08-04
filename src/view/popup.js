@@ -1,6 +1,7 @@
 import { humanizeDate, convertToHoursDuration, convertToMinutesDuration, formatDateForComment } from '../utils.js';
 
 export const createPopupTemplate = (card, comments) => {
+  document.body.classList.add('hide-overflow');
   const filmInfo = card.filmInfo;
   const userDetails = card.userDetails;
   const commentsNumbers = card.comments;

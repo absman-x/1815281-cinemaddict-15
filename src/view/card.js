@@ -1,10 +1,11 @@
 import dayjs from 'dayjs';
 import { convertToHoursDuration, convertToMinutesDuration } from '../utils.js';
 
+const DEFAULT_INDEX = 0;
+const MAX_DESCRIPTION_LENGTH = 140;
+const DESCRIPTION_SHOWN_LENGTH = 139;
+
 export const createCardTemplate = (card) => {
-  const DEFAULT_INDEX = 0;
-  const MAX_DESCRIPTION_LENGTH = 140;
-  const DESCRIPTION_SHOWN_LENGTH = 139;
   const filmInfo = card.filmInfo;
   const userDetails = card.userDetails;
   const runTime = `${convertToHoursDuration(filmInfo.runtime)}h ${convertToMinutesDuration(filmInfo.runtime)}m`;
