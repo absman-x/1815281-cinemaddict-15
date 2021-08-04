@@ -5,9 +5,11 @@ import { createFilmsExtraContainerTemplate } from './view/films-extra.js';
 import { createCardTemplate } from './view/card.js';
 import { createShowMoreButtonTemplate } from './view/show-more-button.js';
 import { createPopupTemplate } from './view/popup.js';
+import { createFooterMovieCountTemplate } from './view/footer.js';
 import { generateCard } from './mock/card-mock.js';
+import { generateComment } from './mock/comment-mock.js';
 
-const MAIN_MOVIE_COUNT = 7;
+const MAIN_MOVIE_COUNT = 27;
 const EXTRA_MOVIE_COUNT = 2;
 const MOVIE_POPUP_INDEX = 0;
 const MOVIE_COUNT_PER_STEP = 5;
@@ -74,7 +76,9 @@ for (let i = 0; i < EXTRA_MOVIE_COUNT; i++) {
 }
 
 const siteBodyElement = document.body;
-render(siteBodyElement, createPopupTemplate(cardList[MOVIE_POPUP_INDEX]), 'beforeend');
+const popupCard = cardList[MOVIE_POPUP_INDEX];
+const comments = (popupCard.comments).map((id) => generateComment(id));
+render(siteBodyElement, createPopupTemplate(popupCard, comments), 'beforeend');
 
 const siteFooterElement = document.querySelector('.footer__statistics');
-siteFooterElement.insertAdjacentHTML('beforeend', `<p>${cardList.length} movies inside</p>`);
+render(siteFooterElement, createFooterMovieCountTemplate(cardList), 'beforeend');

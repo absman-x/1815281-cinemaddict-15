@@ -18,12 +18,12 @@ const generateDate = () => {
   return dayjs().add(daysGap, 'day').format();
 };
 
-export const generateComment = () => {
-  const AUTHOR = `${generateSingleData(AUTHOR_NAME)} ${generateSingleData(AUTHOR_SURNAME)}`;
+export const generateComment = (id) => {
+  const author = `${generateSingleData(AUTHOR_NAME)} ${generateSingleData(AUTHOR_SURNAME)}`;
 
   return {
-    id: getRandomInteger(1, 150),
-    author: AUTHOR,
+    id,
+    author,
     emotion: generateSingleData(EMOTIONS),
     comment: generateSingleData(COMMENT_TEXT),
     date: generateDate(),

@@ -29,7 +29,6 @@ const generateAlternativeTitle = (title) => title.split('').reverse().join('');
 const generateBoolean = () => Boolean(getRandomInteger(0, 1));
 
 const generateDate = (maxDaysGap) => {
-  //const maxDaysGap = 7;
   const daysGap = getRandomInteger(-maxDaysGap, 0);
   const newDate = dayjs().add(daysGap, 'day').toDate();
   return dayjs(newDate).format();
@@ -42,14 +41,14 @@ export const generateCard = () => {
   const filmTitle = generateSingleData(FILM_TITLES);
   const releaseData = {
     date: generateReleaseDate(),
-    release_country: generateSingleData(RELEASE_COUNTRY),
+    releaseCountry: generateSingleData(RELEASE_COUNTRY),
   };
   const filmInfo = {
     title: filmTitle,
-    alternative_title: generateAlternativeTitle(filmTitle),
-    total_rating: getRandomInteger(0, 10),
+    alternativeTitle: generateAlternativeTitle(filmTitle),
+    totalRating: getRandomInteger(0, 10),
     poster: generateSingleData(POSTERS),
-    age_rating: getRandomInteger(0, 100),
+    ageRating: getRandomInteger(0, 100),
     director: generateSingleData(DIRECTORS),
     writers: generateMultiData(WRITERS),
     actors: generateMultiData(ACTORS),
@@ -60,15 +59,15 @@ export const generateCard = () => {
   };
   const userDetails = {
     watchlist: generateBoolean(),
-    already_watched: generateBoolean(),
-    watching_date: generateDate(7),
+    alreadyWatched: generateBoolean(),
+    watchingDate: generateDate(7),
     favorite: generateBoolean(),
   };
 
   return {
     id: getRandomInteger(0, 100),
-    film_info: filmInfo,
-    user_details: userDetails,
+    filmInfo,
+    userDetails,
     comments: commentsList,
   };
 };
