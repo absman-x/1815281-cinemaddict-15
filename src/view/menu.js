@@ -1,4 +1,6 @@
-export const createMenuTemplate = (cardList) => {
+import { createElement } from '../utils.js';
+
+const createMenuTemplate = (cardList) => {
   const watchlistCount = cardList.filter((card) => card.userDetails.watchlist).length;
   const watchedCount = cardList.filter((card) => card.userDetails.already_watched).length;
   const favoriteCount = cardList.filter((card) => card.userDetails.favorite).length;
@@ -17,3 +19,25 @@ export const createMenuTemplate = (cardList) => {
     <li><a href="#" class="sort__button">Sort by rating</a></li>
   </ul>`;
 };
+
+export default class Menu {
+  constructor(cardList) {
+    this._cardList = cardList;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createMenuTemplate(this._cardList);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

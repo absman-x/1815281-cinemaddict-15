@@ -1,13 +1,12 @@
 import dayjs from 'dayjs';
-import { convertToHoursDuration, convertToMinutesDuration } from '../utils.js';
+import { convertToHoursDuration, convertToMinutesDuration, createElement } from '../utils.js';
 
 const DEFAULT_INDEX = 0;
 const MAX_DESCRIPTION_LENGTH = 140;
 const DESCRIPTION_SHOWN_LENGTH = 139;
 
-export const createCardTemplate = (card) => {
-  const filmInfo = card.filmInfo;
-  const userDetails = card.userDetails;
+const createCardTemplate = (card) => {
+  const {filmInfo, userDetails} = card;
   const runTime = `${convertToHoursDuration(filmInfo.runtime)}h ${convertToMinutesDuration(filmInfo.runtime)}m`;
   const filmDescription = filmInfo.description;
   const descriptionAlias = (filmDescription.length > MAX_DESCRIPTION_LENGTH)
@@ -44,3 +43,25 @@ export const createCardTemplate = (card) => {
       </div>
   </article>`;
 };
+
+export default class Card {
+  constructor(card) {
+    this._card = card;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createCardTemplate(this._card);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
