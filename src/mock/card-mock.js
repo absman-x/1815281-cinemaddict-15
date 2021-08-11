@@ -5,6 +5,7 @@ import { getRandomInteger, getRandomUniqueItems } from '../utils.js';
 
 const MIN_DESCRIPTIONS_COUNT = 1;
 const MAX_DESCRIPTIONS_COUNT = 5;
+const MAX_COMMENTS_COUNT = 15;
 
 const generateDescription = () => {
   const descriptionsCount = getRandomInteger(MIN_DESCRIPTIONS_COUNT, MAX_DESCRIPTIONS_COUNT);
@@ -34,10 +35,12 @@ const generateDate = (maxDaysGap) => {
   return dayjs(newDate).format();
 };
 
+const commentNumber = () => getRandomInteger(1, 50);
+
 const generateReleaseDate = () => (generateDate(10000));
 
 export const generateCard = () => {
-  const commentsList = new Array(getRandomInteger(1, 5)).fill(getRandomInteger(1, 50));
+  const commentsList = new Array(getRandomInteger(1, MAX_COMMENTS_COUNT)).fill().map(commentNumber);
   const filmTitle = generateSingleData(FILM_TITLES);
   const releaseData = {
     date: generateReleaseDate(),
@@ -46,7 +49,7 @@ export const generateCard = () => {
   const filmInfo = {
     title: filmTitle,
     alternativeTitle: generateAlternativeTitle(filmTitle),
-    totalRating: getRandomInteger(0, 10),
+    totalRating: getRandomInteger(0, 100),
     poster: generateSingleData(POSTERS),
     ageRating: getRandomInteger(0, 100),
     director: generateSingleData(DIRECTORS),

@@ -6,9 +6,32 @@ dayjs.extend(relativeTime);
 import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isToday);
 
-const getRandomInteger = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+export const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+};
 
-const getRandomUniqueItems = (items, count) => {
+export const render = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement('div');
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};
+
+export const getRandomInteger = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+export const getRandomUniqueItems = (items, count) => {
   let allItems = items.slice();
   const uniqueItems = [];
   while (uniqueItems.length < count) {
@@ -19,15 +42,13 @@ const getRandomUniqueItems = (items, count) => {
   return uniqueItems;
 };
 
-const formatDateForComment = (date) => dayjs(date).isToday()
+export const formatDateForComment = (date) => dayjs(date).isToday()
   ? 'Today'
   : dayjs(date).fromNow();
 
-const checkEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
+export const checkEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
-const humanizeDate = (date) => dayjs(date).format('DD MMMM YYYY');
+export const humanizeDate = (date) => dayjs(date).format('DD MMMM YYYY');
 
-const convertToHoursDuration = (date) => dayjs.duration(date, 'minutes').hours();
-const convertToMinutesDuration = (date) => dayjs.duration(date, 'minutes').minutes();
-
-export { getRandomInteger, getRandomUniqueItems, checkEscEvent, humanizeDate, convertToHoursDuration, convertToMinutesDuration, formatDateForComment };
+export const convertToHoursDuration = (date) => dayjs.duration(date, 'minutes').hours();
+export const convertToMinutesDuration = (date) => dayjs.duration(date, 'minutes').minutes();

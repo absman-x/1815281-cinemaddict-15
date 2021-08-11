@@ -1,7 +1,6 @@
-import { humanizeDate, convertToHoursDuration, convertToMinutesDuration, formatDateForComment } from '../utils.js';
+import { humanizeDate, convertToHoursDuration, convertToMinutesDuration, formatDateForComment, createElement } from '../utils.js';
 
-export const createPopupTemplate = (card, comments) => {
-  document.body.classList.add('hide-overflow');
+const createPopupTemplate = (card, comments) => {
   const filmInfo = card.filmInfo;
   const userDetails = card.userDetails;
   const commentsNumbers = card.comments;
@@ -143,3 +142,26 @@ export const createPopupTemplate = (card, comments) => {
             </form>
           </section>`;
 };
+
+export default class Popup {
+  constructor(card, comments) {
+    this._card = card;
+    this._comments = comments;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPopupTemplate(this._card, this._comments);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

@@ -1,17 +1,14 @@
 import { createElement } from '../utils.js';
 
-const createFooterMovieCountTemplate = (cardList) => (
-  `<p>${cardList.length} movies inside</p>`
-);
+const createFilmsContainerTemplate = () => '<div class="films-list__container">';
 
-export default class Footer {
-  constructor(cardList) {
-    this._cardList = cardList;
+export default class FilmsList {
+  constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createFooterMovieCountTemplate(this._cardList);
+    return createFilmsContainerTemplate();
   }
 
   getElement() {
