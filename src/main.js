@@ -1,5 +1,6 @@
 import UserRankView from './view/rank.js';
 import MenuView from './view/menu.js';
+import SortView from './view/sort.js';
 import FilmsView from './view/films.js';
 import FilmsListView from './view/films-list.js';
 import NoFilmsView from './view/no-films.js';
@@ -60,20 +61,13 @@ const renderCard = (filmsListComponent, card) => {
   const cardComponent = new CardView(card);
   const popupComments = (card.comments).map((id) => generateComment(id));
 
-  cardComponent.getElement().querySelector('.film-card__poster').addEventListener('click', () => {
-    showPopup(card, popupComments);
-    document.addEventListener('keydown', onEscKeyDown);
-  });
+  const allCardListenerHandler = cardComponent.getElement().querySelectorAll('.film-card__poster, .film-card__title, .film-card__comments');
 
-  cardComponent.getElement().querySelector('.film-card__title').addEventListener('click', () => {
-    showPopup(card, popupComments);
-    document.addEventListener('keydown', onEscKeyDown);
-  });
-
-  cardComponent.getElement().querySelector('.film-card__comments').addEventListener('click', () => {
-    showPopup(card, popupComments);
-    document.addEventListener('keydown', onEscKeyDown);
-  });
+  allCardListenerHandler
+    .forEach((element) => element.addEventListener('click', () => {
+      showPopup(card, popupComments);
+      document.addEventListener('keydown', onEscKeyDown);
+    }));
 
   render(filmsListComponent, cardComponent.getElement(), RenderPosition.BEFOREEND);
 };
@@ -132,5 +126,6 @@ const renderFilms = (filmsContainer, filmsCards) => {
 
 render(siteHeaderElement, new UserRankView().getElement(), RenderPosition.BEFOREEND);
 render(siteMainElement, new MenuView(cardList).getElement(), RenderPosition.BEFOREEND);
+render(siteMainElement, new SortView().getElement(), RenderPosition.BEFOREEND);
 renderFilms(siteMainElement, cardList);
 render(siteFooterElement, new FooterView(cardList).getElement(), RenderPosition.BEFOREEND);
