@@ -9,7 +9,8 @@ import CardView from './view/card.js';
 import ShowMoreButtonView from './view/show-more-button.js';
 import PopupView from './view/popup.js';
 import FooterView from './view/footer.js';
-import { render, RenderPosition, checkEscEvent } from './utils.js';
+import { render, RenderPosition } from './utils/render.js';
+import { checkEscEvent } from './utils/common.js';
 import { generateCard } from './mock/card-mock.js';
 import { generateComment } from './mock/comment-mock.js';
 
@@ -45,7 +46,7 @@ const showPopup = (card, popupComments) => {
   siteBodyElement.appendChild(openedPopup);
   siteBodyElement.classList.add('hide-overflow');
 
-  openedPopup.querySelector('.film-details__close-btn').addEventListener('click', () => {
+  popupComponent.setClosePopupHandler(() => {
     closePopup();
   });
 };
@@ -61,13 +62,10 @@ const renderCard = (filmsListComponent, card) => {
   const cardComponent = new CardView(card);
   const popupComments = (card.comments).map((id) => generateComment(id));
 
-  const allCardListenerHandler = cardComponent.getElement().querySelectorAll('.film-card__poster, .film-card__title, .film-card__comments');
-
-  allCardListenerHandler
-    .forEach((element) => element.addEventListener('click', () => {
-      showPopup(card, popupComments);
-      document.addEventListener('keydown', onEscKeyDown);
-    }));
+  cardComponent.setOpenPopupHandler(() => {
+    showPopup(card, popupComments);
+    document.addEventListener('keydown', onEscKeyDown);
+  });
 
   render(filmsListComponent, cardComponent.getElement(), RenderPosition.BEFOREEND);
 };
@@ -97,8 +95,7 @@ const renderFilms = (filmsContainer, filmsCards) => {
     const showMoreButtonComponent = new ShowMoreButtonView();
     render(filmsPlugComponent.getElement(), showMoreButtonComponent.getElement(), RenderPosition.BEFOREEND);
 
-    showMoreButtonComponent.getElement().addEventListener('click', (evt) => {
-      evt.preventDefault();
+    showMoreButtonComponent.setClickHandler(() => {
       cardList
         .slice(renderedMovieCount, renderedMovieCount + MOVIE_COUNT_PER_STEP)
         .forEach((card) => renderCard(filmsListComponent.getElement(), card));

@@ -1,4 +1,4 @@
-import { createElement } from '../utils.js';
+import AbstractView from './abstract.js';
 
 const FILTERS = {
   ALL_MOVIES: 'All movies',
@@ -53,24 +53,13 @@ const createNoFilmsTemplate = (filter) => {
   </section>`;
 };
 
-export default class NoFilms {
+export default class NoFilms extends AbstractView {
   constructor(filter) {
+    super();
     this._filter = filter;
-    this._element = null;
   }
 
   getTemplate() {
     return createNoFilmsTemplate(this._filter);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

@@ -1,4 +1,5 @@
-import { humanizeDate, convertToHoursDuration, convertToMinutesDuration, formatDateForComment, createElement } from '../utils.js';
+import AbstractView from './abstract.js';
+import { humanizeDate, convertToHoursDuration, convertToMinutesDuration, formatDateForComment } from '../utils/common.js';
 
 const createPopupTemplate = (card, comments) => {
   const filmInfo = card.filmInfo;
@@ -143,25 +144,25 @@ const createPopupTemplate = (card, comments) => {
           </section>`;
 };
 
-export default class Popup {
+export default class Popup extends AbstractView {
   constructor(card, comments) {
+    super();
     this._card = card;
     this._comments = comments;
-    this._element = null;
+    this._closePopupClickHandler = this._closePopupClickHandler.bind(this);
   }
 
   getTemplate() {
     return createPopupTemplate(this._card, this._comments);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
+  _closePopupClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.closePopupClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setClosePopupHandler(callback) {
+    this._callback.closePopupClick = callback;
+    this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._closePopupClickHandler);
   }
 }

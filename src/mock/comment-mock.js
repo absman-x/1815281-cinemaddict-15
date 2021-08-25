@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 import { EMOTIONS, AUTHOR_NAME, AUTHOR_SURNAME, COMMENT_TEXT } from './const_mock.js';
-import { getRandomInteger } from '../utils.js';
+import { getRandomInteger } from '../utils/common.js';
 
 const generateSingleData = (data) => {
   const randomIndex = getRandomInteger(0, data.length - 1);
