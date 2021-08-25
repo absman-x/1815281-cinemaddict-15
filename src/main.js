@@ -46,7 +46,7 @@ const showPopup = (card, popupComments) => {
   siteBodyElement.appendChild(openedPopup);
   siteBodyElement.classList.add('hide-overflow');
 
-  openedPopup.querySelector('.film-details__close-btn').addEventListener('click', () => {
+  popupComponent.setClosePopupHandler(() => {
     closePopup();
   });
 };
@@ -95,8 +95,7 @@ const renderFilms = (filmsContainer, filmsCards) => {
     const showMoreButtonComponent = new ShowMoreButtonView();
     render(filmsPlugComponent.getElement(), showMoreButtonComponent.getElement(), RenderPosition.BEFOREEND);
 
-    showMoreButtonComponent.getElement().addEventListener('click', (evt) => {
-      evt.preventDefault();
+    showMoreButtonComponent.setClickHandler(() => {
       cardList
         .slice(renderedMovieCount, renderedMovieCount + MOVIE_COUNT_PER_STEP)
         .forEach((card) => renderCard(filmsListComponent.getElement(), card));
