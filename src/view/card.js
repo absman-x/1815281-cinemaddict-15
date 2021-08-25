@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
-import { convertToHoursDuration, convertToMinutesDuration, createElement } from '../utils.js';
+import AbstractView from './abstract.js';
+import { convertToHoursDuration, convertToMinutesDuration } from '../utils/common.js';
 
 const DEFAULT_INDEX = 0;
 const MAX_DESCRIPTION_LENGTH = 140;
@@ -44,24 +45,25 @@ const createCardTemplate = (card) => {
   </article>`;
 };
 
-export default class Card {
+export default class Card extends AbstractView {
   constructor(card) {
+    super();
     this._card = card;
-    this._element = null;
+
+    this._openPopupClickHandler = this._openPopupClickHandler.bind(this);
   }
 
   getTemplate() {
     return createCardTemplate(this._card);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
+  _openPopupClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.openPopupClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setOpenPopupHandler(callback) {
+    this._callback.openPopupClick = callback;
+    this.getElement().querySelectorAll('.film-card__poster, .film-card__title, .film-card__comments').forEach((selector) => selector.addEventListener('click', this._openPopupClickHandler));
   }
 }

@@ -1,7 +1,7 @@
 
 import dayjs from 'dayjs';
 import { DESCRIPTIONS, FILM_TITLES, POSTERS, WRITERS, ACTORS, DIRECTORS, GENRE, RELEASE_COUNTRY } from './const_mock.js';
-import { getRandomInteger, getRandomUniqueItems } from '../utils.js';
+import { getRandomInteger, getRandomUniqueItems } from '../utils/common.js';
 
 const MIN_DESCRIPTIONS_COUNT = 1;
 const MAX_DESCRIPTIONS_COUNT = 5;
