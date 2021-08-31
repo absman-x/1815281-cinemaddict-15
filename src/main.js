@@ -1,5 +1,5 @@
 import UserRankView from './view/rank.js';
-import MenuView from './view/menu.js';
+/*import MenuView from './view/menu.js';
 import SortView from './view/sort.js';
 import FilmsView from './view/films.js';
 import FilmsListView from './view/films-list.js';
@@ -7,16 +7,17 @@ import NoFilmsView from './view/no-films.js';
 import ExtraView from './view/films-extra.js';
 import CardView from './view/card.js';
 import ShowMoreButtonView from './view/show-more-button.js';
-import PopupView from './view/popup.js';
+import PopupView from './view/popup.js';*/
 import FooterView from './view/footer.js';
-import { render, RenderPosition } from './utils/render.js';
-import { checkEscEvent } from './utils/common.js';
+import { render, RenderPosition, remove } from './utils/render.js';
+//import { checkEscEvent } from './utils/common.js';
 import { generateCard } from './mock/card-mock.js';
-import { generateComment } from './mock/comment-mock.js';
+//import { generateComment } from './mock/comment-mock.js';
+import MoviePresenter from './presenter/films-board.js';
 
-const MAIN_MOVIE_COUNT = 23;
+const MAIN_MOVIE_COUNT = 12;
 const EXTRA_MOVIE_COUNT = 2;
-const MOVIE_COUNT_PER_STEP = 5;
+//const MOVIE_COUNT_PER_STEP = 5;
 
 const cardList = new Array(MAIN_MOVIE_COUNT).fill().map(generateCard);
 const mostCommentedCards = cardList.slice().sort((element1, element2) => element2.comments.length - element1.comments.length).splice(0, EXTRA_MOVIE_COUNT);
@@ -27,7 +28,7 @@ const siteHeaderElement = document.querySelector('.header');
 const siteFooterElement = document.querySelector('.footer__statistics');
 const siteBodyElement = document.body;
 
-let openedPopup = undefined;
+/*let openedPopup = undefined;
 
 const closePopup = () => {
   document.removeEventListener('keydown', onEscKeyDown);
@@ -67,7 +68,7 @@ const renderCard = (filmsListComponent, card) => {
     document.addEventListener('keydown', onEscKeyDown);
   });
 
-  render(filmsListComponent, cardComponent.getElement(), RenderPosition.BEFOREEND);
+  render(filmsListComponent, cardComponent, RenderPosition.BEFOREEND);
 };
 
 const renderFilms = (filmsContainer, filmsCards) => {
@@ -75,54 +76,57 @@ const renderFilms = (filmsContainer, filmsCards) => {
   const filmsPlugComponent = new NoFilmsView();
   const filmsListComponent = new FilmsListView();
 
-  render(filmsContainer, filmsComponent.getElement(), RenderPosition.BEFOREEND);
+  render(filmsContainer, filmsComponent, RenderPosition.BEFOREEND);
 
   if (filmsCards.length === 0) {
-    render(filmsComponent.getElement(), new NoFilmsView('All movies').getElement(), RenderPosition.AFTERBEGIN);
+    render(filmsComponent, new NoFilmsView('All movies'), RenderPosition.AFTERBEGIN);
     return;
   }
 
-  render(filmsComponent.getElement(), filmsPlugComponent.getElement(), RenderPosition.AFTERBEGIN);
-  render(filmsPlugComponent.getElement(), filmsListComponent.getElement(), RenderPosition.BEFOREEND);
+  render(filmsComponent, filmsPlugComponent, RenderPosition.AFTERBEGIN);
+  render(filmsPlugComponent, filmsListComponent, RenderPosition.BEFOREEND);
 
   cardList
     .slice(0, Math.min(cardList.length, MOVIE_COUNT_PER_STEP))
-    .forEach((card) => renderCard(filmsListComponent.getElement(), card));
+    .forEach((card) => renderCard(filmsListComponent, card));
 
   if (cardList.length > MOVIE_COUNT_PER_STEP) {
     let renderedMovieCount = MOVIE_COUNT_PER_STEP;
 
     const showMoreButtonComponent = new ShowMoreButtonView();
-    render(filmsPlugComponent.getElement(), showMoreButtonComponent.getElement(), RenderPosition.BEFOREEND);
+    render(filmsPlugComponent, showMoreButtonComponent, RenderPosition.BEFOREEND);
 
     showMoreButtonComponent.setClickHandler(() => {
       cardList
         .slice(renderedMovieCount, renderedMovieCount + MOVIE_COUNT_PER_STEP)
-        .forEach((card) => renderCard(filmsListComponent.getElement(), card));
+        .forEach((card) => renderCard(filmsListComponent, card));
 
       renderedMovieCount += MOVIE_COUNT_PER_STEP;
 
       if (renderedMovieCount >= cardList.length) {
-        showMoreButtonComponent.getElement().remove();
+        remove(showMoreButtonComponent);
       }
     });
   }
   const siteFilmsTopRatedElement = new ExtraView('Top rated');
   const siteFilmsMostCommentedElement = new ExtraView('Most commented');
-  render(filmsComponent.getElement(), siteFilmsTopRatedElement.getElement(), RenderPosition.BEFOREEND);
-  render(filmsComponent.getElement(), siteFilmsMostCommentedElement.getElement(), RenderPosition.BEFOREEND);
+  render(filmsComponent, siteFilmsTopRatedElement, RenderPosition.BEFOREEND);
+  render(filmsComponent, siteFilmsMostCommentedElement, RenderPosition.BEFOREEND);
 
   const filmsTopRatedListComponent = new FilmsListView();
-  render(siteFilmsTopRatedElement.getElement(), filmsTopRatedListComponent.getElement(), RenderPosition.BEFOREEND);
-  topRatedCards.forEach((card) => renderCard(filmsTopRatedListComponent.getElement(), card));
+  render(siteFilmsTopRatedElement, filmsTopRatedListComponent, RenderPosition.BEFOREEND);
+  topRatedCards.forEach((card) => renderCard(filmsTopRatedListComponent, card));
 
   const filmsMostCommentedListComponent = new FilmsListView();
-  render(siteFilmsMostCommentedElement.getElement(), filmsMostCommentedListComponent.getElement(), RenderPosition.BEFOREEND);
-  mostCommentedCards.forEach((card) => renderCard(filmsMostCommentedListComponent.getElement(), card));
-};
+  render(siteFilmsMostCommentedElement, filmsMostCommentedListComponent, RenderPosition.BEFOREEND);
+  mostCommentedCards.forEach((card) => renderCard(filmsMostCommentedListComponent, card));
+}; */
+const moviePresenter = new MoviePresenter(siteMainElement);
 
-render(siteHeaderElement, new UserRankView().getElement(), RenderPosition.BEFOREEND);
-render(siteMainElement, new MenuView(cardList).getElement(), RenderPosition.BEFOREEND);
-render(siteMainElement, new SortView().getElement(), RenderPosition.BEFOREEND);
-renderFilms(siteMainElement, cardList);
-render(siteFooterElement, new FooterView(cardList).getElement(), RenderPosition.BEFOREEND);
+render(siteHeaderElement, new UserRankView(), RenderPosition.BEFOREEND);
+//render(siteMainElement, new MenuView(cardList), RenderPosition.BEFOREEND);
+//render(siteMainElement, new SortView(), RenderPosition.BEFOREEND);
+//renderFilms(siteMainElement, cardList);
+render(siteFooterElement, new FooterView(cardList), RenderPosition.BEFOREEND);
+
+moviePresenter.init(cardList);

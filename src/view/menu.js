@@ -2,7 +2,7 @@ import AbstractView from './abstract.js';
 
 const createMenuTemplate = (cardList) => {
   const watchlistCount = cardList.filter((card) => card.userDetails.watchlist).length;
-  const watchedCount = cardList.filter((card) => card.userDetails.already_watched).length;
+  const watchedCount = cardList.filter((card) => card.userDetails.alreadyWatched).length;
   const favoriteCount = cardList.filter((card) => card.userDetails.favorite).length;
   return `<nav class="main-navigation">
     <div class="main-navigation__items">
