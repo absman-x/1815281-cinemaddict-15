@@ -63,10 +63,9 @@ export default class Movie {
   _handleCardChange(updatedCard) {
     this._cardList = updateItem(this._cardList, updatedCard);
     this._sourcedCardList = updateItem(this._sourcedCardList, updatedCard);
-    this._cardPresenter.get(updatedCard.id).init(updatedCard);
-    this._extraTopRatedPresenter.get(updatedCard.id).init(updatedCard);
-    this._extraMostCommentedPresenter.get(updatedCard.id).init(updatedCard);
-    //this._cardPresenter.get(updatedCard.id).forEach((presenter) => presenter.init(updatedCard));
+    this._cardPresenter.has(updatedCard.id) ? this._cardPresenter.get(updatedCard.id).init(updatedCard) : '';
+    this._extraTopRatedPresenter.has(updatedCard.id) ? this._extraTopRatedPresenter.get(updatedCard.id).init(updatedCard) : '';
+    this._extraMostCommentedPresenter.has(updatedCard.id) ? this._extraMostCommentedPresenter.get(updatedCard.id).init(updatedCard) : '';
   }
 
   _sortCards(sortType) {

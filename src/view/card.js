@@ -7,34 +7,34 @@ const MAX_DESCRIPTION_LENGTH = 140;
 const DESCRIPTION_SHOWN_LENGTH = 139;
 
 const createCardTemplate = (card) => {
-  const {filmInfo, userDetails} = card;
-  const runTime = `${convertToHoursDuration(filmInfo.runtime)}h ${convertToMinutesDuration(filmInfo.runtime)}m`;
-  const filmDescription = filmInfo.description;
+  const { title, totalRating, description, releaseDate, genre, poster, runtime, isAlreadyWatched, isFavorite, isInWatchlist} = card;
+  const runTime = `${convertToHoursDuration(runtime)}h ${convertToMinutesDuration(runtime)}m`;
+  const filmDescription = description;
   const descriptionAlias = (filmDescription.length > MAX_DESCRIPTION_LENGTH)
     ? `${filmDescription.substring(0, DESCRIPTION_SHOWN_LENGTH)}…`
     : filmDescription;
 
-  const addWatchListClassName = userDetails.watchlist
+  const addWatchListClassName = isInWatchlist
     ? 'film-card__controls-item--active'
     : '';
 
-  const watchedClassName = userDetails.alreadyWatched
+  const watchedClassName = isAlreadyWatched
     ? 'film-card__controls-item--active'
     : '';
 
-  const favoriteClassName = userDetails.favorite
+  const favoriteClassName = isFavorite
     ? 'film-card__controls-item--active'
     : '';
 
   return `<article class="film-card">
-    <h3 class="film-card__title">${filmInfo.title}</h3>
-    <p class="film-card__rating">${filmInfo.totalRating}</p>
+    <h3 class="film-card__title">${title}</h3>
+    <p class="film-card__rating">${totalRating}</p>
     <p class="film-card__info">
-      <span class="film-card__year">${ dayjs(filmInfo.release['date']).year() }</span>
+      <span class="film-card__year">${ dayjs(releaseDate).year() }</span>
       <span class="film-card__duration">${runTime}</span>
-      <span class="film-card__genre">${filmInfo.genre[DEFAULT_INDEX]}</span>
+      <span class="film-card__genre">${genre[DEFAULT_INDEX]}</span>
     </p>
-    <img src="${filmInfo.poster}" alt="" class="film-card__poster">
+    <img src="${poster}" alt="" class="film-card__poster">
       <p class="film-card__description">${descriptionAlias}</p>
       <a class="film-card__comments">${card.comments.length} comments</a>
       <div class="film-card__controls">

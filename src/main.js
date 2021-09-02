@@ -2,7 +2,6 @@ import UserRankView from './view/rank.js';
 import FooterView from './view/footer.js';
 import { render, RenderPosition } from './utils/render.js';
 import { generateCard } from './mock/card-mock.js';
-//import MoviePresenter from './presenter/films-board.js';
 import MoviePresenter from './presenter/film-board.js';
 
 const MAIN_MOVIE_COUNT = 12;
