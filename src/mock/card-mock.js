@@ -42,11 +42,9 @@ const generateReleaseDate = () => (generateDate(10000));
 export const generateCard = () => {
   const commentsList = new Array(getRandomInteger(1, MAX_COMMENTS_COUNT)).fill().map(commentNumber);
   const filmTitle = generateSingleData(FILM_TITLES);
-  const releaseData = {
-    date: generateReleaseDate(),
-    releaseCountry: generateSingleData(RELEASE_COUNTRY),
-  };
-  const filmInfo = {
+
+  return {
+    id: getRandomInteger(0, 100),
     title: filmTitle,
     alternativeTitle: generateAlternativeTitle(filmTitle),
     totalRating: getRandomInteger(0, 100),
@@ -56,21 +54,14 @@ export const generateCard = () => {
     writers: generateMultiData(WRITERS),
     actors: generateMultiData(ACTORS),
     description: generateDescription(),
-    release: releaseData,
+    releaseDate: generateReleaseDate(),
+    releaseCountry: generateSingleData(RELEASE_COUNTRY),
     runtime: getRandomInteger(90, 190),
     genre: generateMultiData(GENRE),
-  };
-  const userDetails = {
-    watchlist: generateBoolean(),
-    alreadyWatched: generateBoolean(),
+    isInWatchlist: generateBoolean(),
+    isAlreadyWatched: generateBoolean(),
     watchingDate: generateDate(7),
-    favorite: generateBoolean(),
-  };
-
-  return {
-    id: getRandomInteger(0, 100),
-    filmInfo,
-    userDetails,
+    isFavorite: generateBoolean(),
     comments: commentsList,
   };
 };

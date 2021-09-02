@@ -2,27 +2,25 @@ import AbstractView from './abstract.js';
 import { humanizeDate, convertToHoursDuration, convertToMinutesDuration, formatDateForComment } from '../utils/common.js';
 
 const createPopupTemplate = (card, comments) => {
-  const filmInfo = card.filmInfo;
-  const userDetails = card.userDetails;
+  const { title, alternativeTitle, ageRating, totalRating, director, description, releaseDate, releaseCountry, writers, actors, genre, poster, runtime, isAlreadyWatched, isFavorite, isInWatchlist } = card;
   const commentsNumbers = card.comments;
-  const runTime = `${convertToHoursDuration(filmInfo.runtime)}h ${convertToMinutesDuration(filmInfo.runtime)}m`;
+  const runTime = `${convertToHoursDuration(runtime)}h ${convertToMinutesDuration(runtime)}m`;
 
-  const filmGenre = filmInfo.genre;
-  const genreAlias = filmGenre.length !== 1
+  const genreAlias = genre.length !== 1
     ? 'Genres'
     : 'Genre';
 
-  const filmsDetailsGenres = filmGenre.map((genre) => `<span class="film-details__genre">${genre}</span>`);
+  const filmsDetailsGenres = genre.map((element) => `<span class="film-details__genre">${element}</span>`);
 
-  const addWatchListClassName = userDetails.watchlist
+  const addWatchListClassName = isInWatchlist
     ? 'film-details__control-button--active'
     : '';
 
-  const watchedClassName = userDetails.alreadyWatched
+  const watchedClassName = isAlreadyWatched
     ? 'film-details__control-button--active'
     : '';
 
-  const favoriteClassName = userDetails.favorite
+  const favoriteClassName = isFavorite
     ? 'film-details__control-button--active'
     : '';
 
@@ -53,35 +51,35 @@ const createPopupTemplate = (card, comments) => {
                 </div>
                 <div class="film-details__info-wrap">
                   <div class="film-details__poster">
-                    <img class="film-details__poster-img" src="${filmInfo.poster}" alt="">
-                    <p class="film-details__age">${filmInfo.ageRating}+</p>
+                    <img class="film-details__poster-img" src="${poster}" alt="">
+                    <p class="film-details__age">${ageRating}+</p>
                   </div>
                   <div class="film-details__info">
                     <div class="film-details__info-head">
                       <div class="film-details__title-wrap">
-                        <h3 class="film-details__title">${filmInfo.title}</h3>
-                        <p class="film-details__title-original">Original: ${filmInfo.alternativeTitle}</p>
+                        <h3 class="film-details__title">${title}</h3>
+                        <p class="film-details__title-original">Original: ${alternativeTitle}</p>
                       </div>
                       <div class="film-details__rating">
-                        <p class="film-details__total-rating">${filmInfo.totalRating}</p>
+                        <p class="film-details__total-rating">${totalRating}</p>
                       </div>
                     </div>
                     <table class="film-details__table">
                       <tr class="film-details__row">
                         <td class="film-details__term">Director</td>
-                        <td class="film-details__cell">${filmInfo.director}</td>
+                        <td class="film-details__cell">${director}</td>
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Writers</td>
-                        <td class="film-details__cell">${filmInfo.writers.join(', ')}</td>
+                        <td class="film-details__cell">${writers.join(', ')}</td>
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Actors</td>
-                        <td class="film-details__cell">${filmInfo.actors.join(', ')}</td>
+                        <td class="film-details__cell">${actors.join(', ')}</td>
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Release Date</td>
-                        <td class="film-details__cell">${humanizeDate(filmInfo.release['date'])}</td>
+                        <td class="film-details__cell">${humanizeDate(releaseDate)}</td>
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Runtime</td>
@@ -89,7 +87,7 @@ const createPopupTemplate = (card, comments) => {
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">Country</td>
-                        <td class="film-details__cell">${filmInfo.release['releaseCountry']}</td>
+                        <td class="film-details__cell">${releaseCountry}</td>
                       </tr>
                       <tr class="film-details__row">
                         <td class="film-details__term">${genreAlias}</td>
@@ -98,7 +96,7 @@ const createPopupTemplate = (card, comments) => {
                       </tr>
                     </table>
                     <p class="film-details__film-description">
-                      ${filmInfo.description}
+                      ${description}
                     </p>
                   </div>
                 </div>
@@ -150,6 +148,9 @@ export default class Popup extends AbstractView {
     this._card = card;
     this._comments = comments;
     this._closePopupClickHandler = this._closePopupClickHandler.bind(this);
+    this._watchlistPopupClickHandler = this._watchlistPopupClickHandler.bind(this);
+    this._historyPopupClickHandler = this._historyPopupClickHandler.bind(this);
+    this._favoritePopupClickHandler = this._favoritePopupClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -164,5 +165,35 @@ export default class Popup extends AbstractView {
   setClosePopupHandler(callback) {
     this._callback.closePopupClick = callback;
     this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._closePopupClickHandler);
+  }
+
+  _watchlistPopupClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.watchlistPopupClick();
+  }
+
+  setWatchlistPopupClickHandler(callback) {
+    this._callback.watchlistPopupClick = callback;
+    this.getElement().querySelector('.film-details__control-button--watchlist').addEventListener('click', this._watchlistPopupClickHandler);
+  }
+
+  _historyPopupClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.historyPopupClick();
+  }
+
+  setHistoryPopupClickHandler(callback) {
+    this._callback.historyPopupClick = callback;
+    this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._historyPopupClickHandler);
+  }
+
+  _favoritePopupClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoritePopupClick();
+  }
+
+  setFavoritePopupClickHandler(callback) {
+    this._callback.favoritePopupClick = callback;
+    this.getElement().querySelector('.film-details__control-button--favorite').addEventListener('click', this._favoritePopupClickHandler);
   }
 }

@@ -231,8 +231,8 @@ const AUTHOR_NAME = [
 const AUTHOR_SURNAME = [
   'Doe',
   'Makoveev',
-  'James',
-  'O-Caml',
+  'St\'James',
+  'Al\'Fasad',
   'Weiss',
 ];
 
