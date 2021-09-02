@@ -33,7 +33,7 @@ export default class Card {
   init(card) {
     this._card = card;
     const prevCardComponent = this._cardComponent;
-    //const prevCardEditComponent = this._cardEditComponent;
+    const prevPopupComponent = this._popupComponent;
 
     this._cardComponent = new CardView(card);
     this._popupComments = (this._card.comments).map((id) => generateComment(id));
@@ -46,7 +46,7 @@ export default class Card {
     this._cardComponent.setHistoryClickHandler(this._handleHistoryClick);// нет обработчика this._handleArchiveClick
     //this._cardEditComponent.setFormSubmitHandler(this._handleFormSubmit);
 
-    if (prevCardComponent === null) {// || prevCardEditComponent === null) {
+    if (prevCardComponent === null || prevPopupComponent === null) {
       render(this._cardListContainer, this._cardComponent, RenderPosition.BEFOREEND);
       return;
     }
@@ -86,23 +86,25 @@ export default class Card {
   }
 
   _handleOpenPopupClick() {
+    console.log('popup open');
     if (this._currentPopup) { this._handleClosePopupClick(); }
 
     this._currentPopup = this._popupComponent.getElement();
     this._popupComponent.setFavoritePopupClickHandler(this._handleFavoriteClick);
     this._popupComponent.setWatchlistPopupClickHandler(this._handleWatchlistClick);
     this._popupComponent.setHistoryPopupClickHandler(this._handleHistoryClick);
-    siteBodyElement.appendChild(this._currentPopup);
-    siteBodyElement.classList.add('hide-overflow');
     document.addEventListener('keydown', this._escKeyDownHandler);
     this._changeMode();
     this._mode = Mode.POPUP_OPEN;
     this._popupComponent.setClosePopupHandler(() => {
       this._handleClosePopupClick();
     });
+    siteBodyElement.appendChild(this._currentPopup);
+    siteBodyElement.classList.add('hide-overflow');
   }
 
   _handleClosePopupClick() {
+    console.log('popup closed');
     document.removeEventListener('keydown', this._escKeyDownHandler);
     siteBodyElement.removeChild(this._currentPopup);
     siteBodyElement.classList.remove('hide-overflow');
