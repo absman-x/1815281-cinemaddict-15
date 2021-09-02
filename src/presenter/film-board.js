@@ -63,9 +63,15 @@ export default class Movie {
   _handleCardChange(updatedCard) {
     this._cardList = updateItem(this._cardList, updatedCard);
     this._sourcedCardList = updateItem(this._sourcedCardList, updatedCard);
-    this._cardPresenter.has(updatedCard.id) ? this._cardPresenter.get(updatedCard.id).init(updatedCard) : '';
-    this._extraTopRatedPresenter.has(updatedCard.id) ? this._extraTopRatedPresenter.get(updatedCard.id).init(updatedCard) : '';
-    this._extraMostCommentedPresenter.has(updatedCard.id) ? this._extraMostCommentedPresenter.get(updatedCard.id).init(updatedCard) : '';
+    if (this._cardPresenter.has(updatedCard.id)) {
+      this._cardPresenter.get(updatedCard.id).init(updatedCard);
+    }
+    if (this._extraTopRatedPresenter.has(updatedCard.id)) {
+      this._extraTopRatedPresenter.get(updatedCard.id).init(updatedCard);
+    }
+    if (this._extraMostCommentedPresenter.has(updatedCard.id)) {
+      this._extraMostCommentedPresenter.get(updatedCard.id).init(updatedCard);
+    }
   }
 
   _sortCards(sortType) {
@@ -75,25 +81,24 @@ export default class Movie {
     switch (sortType) {
       case SortType.DATE:
         this._cardList.sort(sortDate);
-        this._setActiveButton(sortType);
         break;
       case SortType.RATING:
         this._cardList.sort(sortRating);
-        this._setActiveButton(sortType);
         break;
       default:
         // 3. А когда пользователь захочет "вернуть всё, как было",
         // мы просто запишем в _cardList исходный массив
         this._cardList = this._sourcedCardList.slice();
-        this._setActiveButton(sortType);
     }
 
     this._currentSortType = sortType;
-  }
-
-  _setActiveButton(sortType) {
-    document.querySelectorAll('[data-sort-type]').forEach((element) => element.classList.remove('sort__button--active'));
-    document.querySelector(`[data-sort-type=${sortType}`).classList.add('sort__button--active');
+    this._sortComponent.getElement().querySelectorAll('.sort__button').forEach((sortButton) => {
+      if (sortButton.dataset.sortType === this._currentSortType) {
+        sortButton.classList.add('sort__button--active');
+      } else {
+        sortButton.classList.remove('sort__button--active');
+      }
+    });
   }
 
   _handleSortTypeChange(sortType) {
@@ -111,16 +116,9 @@ export default class Movie {
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
-  /*_renderCard(container, card) {
-    const cardPresenter = new CardPresenter(container, this._handleCardChange, this._handleModeChange);
-    cardPresenter.init(card);
-    this._cardPresenter.set(card.id, cardPresenter);
-  }*/
-
   _renderCard(presenter, container, card) {
     const cardPresenter = new CardPresenter(container, this._handleCardChange, this._handleModeChange);
     cardPresenter.init(card);
-    //this.presenter.set(card.id, cardPresenter);
     presenter.set(card.id, cardPresenter);
   }
 
@@ -150,7 +148,6 @@ export default class Movie {
   }
 
   _clearCardList() {
-    //this._cardPresenter.forEach((presenter) => presenter.destroy());
     this._cardPresenter.forEach((presenter) => presenter.destroy());
     this._cardPresenter.clear();
     this._renderedCardCount = MOVIE_COUNT_PER_STEP;
@@ -186,7 +183,6 @@ export default class Movie {
 
   _renderMovie() {
     if (this._cardList.length === 0) {
-      //render(this._filmsComponent, this._noFilmsComponent('All movies'), RenderPosition.AFTERBEGIN);
       this._renderNoFilms('All movies');
       return;
     }
@@ -194,8 +190,7 @@ export default class Movie {
     this._renderSort();
     this._renderMenu(this._cardList);
     this._renderCardList();
-    //this._renderExtraCardsList(this._extraTopRatedPresenter, FilmsExtraList.TOP_RATED, this._sourcedCardList.slice().sort(sortRating).splice(0, EXTRA_MOVIE_COUNT));
-    //this._renderExtraCardsList(this._extraMostCommentedPresenter, FilmsExtraList.MOST_COMMENTED, this._sourcedCardList.slice().sort(sortComments).splice(0, EXTRA_MOVIE_COUNT));
+
     this._renderExtraCardsList(this._extraTopRatedPresenter, FilmsExtraList.TOP_RATED, sortRating);
     this._renderExtraCardsList(this._extraMostCommentedPresenter, FilmsExtraList.MOST_COMMENTED, sortComments);
   }
