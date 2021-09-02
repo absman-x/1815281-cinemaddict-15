@@ -7,16 +7,14 @@ import ExtraView from '../view/films-extra.js';
 import CardView from '../view/card.js';
 import ShowMoreButtonView from '../view/show-more-button.js';
 import PopupView from '../view/popup.js';
-import { render, RenderPosition, remove } from '../utils/render.js';
+import { updateItem } from '../utils/common.js';
+import { render, RenderPosition, remove, replace } from '../utils/render.js';
 //не должно быть в presenter?
 import { generateComment } from '../mock/comment-mock.js';
 
 const MOVIE_COUNT_PER_STEP = 5;
 const EXTRA_MOVIE_COUNT = 2;
-const PopupStatus = {
-  CLOSED: 'CLOSED',
-  OPENED: 'OPENED',
-};
+
 const FilmsExtraList = {
   TOP_RATED: 'Top rated',
   MOST_COMMENTED: 'Most commented',
@@ -27,15 +25,19 @@ export default class Movie {
   constructor(movieContainer) {
     this._movieContainer = movieContainer;
     this._renderedCardCount = MOVIE_COUNT_PER_STEP;
-    this._popupStatus = PopupStatus.CLOSED;
     this._filmsComponent = new FilmsView();
     //this._menuComponent = new MenuView(cardList);
     this._sortComponent = new SortView();
     this._filmsListComponent = new FilmsListView();
     this._noFilmsComponent = new NoFilmsView();
     this._showMoreButtonComponent = new ShowMoreButtonView();
+    this._currentPopup = undefined;
+    this._updatedCard = undefined;
 
-    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    /*this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
+    this._handleHistoryClick = this._handleHistoryClick.bind(this);
+    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);*/
+    this._handleEscKeyDown = this._handleEscKeyDown.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
   }
 
@@ -66,40 +68,43 @@ export default class Movie {
     render(this._movieContainer, this._sortComponent, RenderPosition.AFTERBEGIN);
   }
 
-  _renderCard(component, card) {
+  _renderCard(container, card) {
     // Метод, куда уйдёт логика созданию и рендерингу компонетов задачи,
     // текущая функция renderTask в main.js
-    this._card = card;
-    this._cardComponent = new CardView(this._card);
-    this._popupComments = (this._card.comments).map((id) => generateComment(id));
-    this._component = component;
+    //this._card = card;
+    const card2 = card;
+    console.log(card);
+    this._cardComponent = new CardView(card);
+    //popupComments = (card.comments).map((id) => generateComment(id));
+    this._container = container;
 
+    this._cardComponent.setFavoriteClickHandler(this._handleFavoriteClick(card2));
     this._cardComponent.setOpenPopupHandler(() => {
-      this._showPopup(this._card, this._popupComments);
-      document.addEventListener('keydown', this._escKeyDownHandler);
+      //this._showPopup(card, popupComments);
+      this._showPopup(card);
+      document.addEventListener('keydown', this._handleEscKeyDown);
     });
 
-    render(this._component, this._cardComponent, RenderPosition.BEFOREEND);
+    render(this._container, this._cardComponent, RenderPosition.BEFOREEND);
   }
 
-  _escKeyDownHandler(evt) {
+  _handleEscKeyDown(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this._closePopup();
     }
   }
 
-  _showPopup(card, popupComments) {
+  _showPopup(card) {
     this._card = card;
-    this._popupCommenst = popupComments;
-    this._popupComponent = new PopupView(this._card, this._popupCommenst);
+    //this._popupComments = popupComments;
+    this._popupComments = (card.comments).map((id) => generateComment(id));
+    this._popupComponent = new PopupView(this._card, this._popupComments);
 
-    if (this._popupStatus !== PopupStatus.CLOSED) {
-      this._closePopup();
-    }
-    //openedPopup = this._popupComponent;
-    this._popupStatus = PopupStatus.OPENED;
-    siteBodyElement.appendChild(this._popupComponent.getElement());
+    if (this._currentPopup) {this._closePopup();}
+
+    this._currentPopup = this._popupComponent.getElement();
+    siteBodyElement.appendChild(this._currentPopup);
     siteBodyElement.classList.add('hide-overflow');
 
     this._popupComponent.setClosePopupHandler(() => {
@@ -108,10 +113,10 @@ export default class Movie {
   }
 
   _closePopup() {
-    document.removeEventListener('keydown', this._escKeyDownHandler);
-    siteBodyElement.removeChild(this._popupComponent.getElement());
+    document.removeEventListener('keydown', this._handleEscKeyDown);
+    siteBodyElement.removeChild(this._currentPopup);
     siteBodyElement.classList.remove('hide-overflow');
-    this._popupStatus = PopupStatus.CLOSED;
+    this._currentPopup = undefined;
   }
 
   _renderCards(from, to) {
@@ -135,17 +140,28 @@ export default class Movie {
     }
   }
 
+  _handleCardChange(updatedCard) {
+    this._cardList = updateItem(this._cardList, updatedCard);
+    this._sourcedCardList = updateItem(this._sourcedCardList, updatedCard);
+    //this._taskPresenter.get(updatedCard.id).init(updatedCard);
+  }
+
+  _handleFavoriteClick(card) {
+    console.log(card);
+    //this._card = card;
+    this._updatedCard = card;
+    console.log(this._updatedCard);
+    this._updatedCard.userDetails = Object.assign({}, card.userDetails, { favorite: !card.userDetails.favorite});
+    console.log(this._updatedCard);
+  }
+
   _renderShowMoreButton() {
-    // Метод, куда уйдёт логика по отрисовке кнопки допоказа задач,
-    // сейчас в main.js является частью renderBoard
     render(this._noFilmsComponent, this._showMoreButtonComponent, RenderPosition.BEFOREEND);
 
     this._showMoreButtonComponent.setClickHandler(this._handleShowMoreButtonClick);
   }
 
   _renderCardsList() {
-    //render(this._filmsComponent, this._noFilmsComponent, RenderPosition.AFTERBEGIN);
-    //render(this._noFilmsComponent, this._filmsListComponent, RenderPosition.BEFOREEND);
     this._renderCards(0, Math.min(this._cardList.length, MOVIE_COUNT_PER_STEP));
 
     if (this._cardList.length > MOVIE_COUNT_PER_STEP) {
@@ -153,14 +169,12 @@ export default class Movie {
     }
   }
 
-  _renderExtraCardsList(extraListType) {
-    this._extraCardsListElement = new ExtraView(extraListType);
-    render(this._filmsComponent, this._extraCardsListElement, RenderPosition.BEFOREEND);
-    this.__extraCardsListComponent = new FilmsListView();
-    render(this._extraCardsListElement, this.__extraCardsListComponent, RenderPosition.BEFOREEND);
-    if (extraListType === FilmsExtraList.MOST_COMMENTED) {this._extraCards = this._cardList.slice().sort((element1, element2) => element2.comments.length - element1.comments.length).splice(0, EXTRA_MOVIE_COUNT);}
-    if (extraListType === FilmsExtraList.TOP_RATED) {this._extraCards = this._cardList.slice().sort((element1, element2) => element2.filmInfo.totalRating - element1.filmInfo.totalRating).splice(0, EXTRA_MOVIE_COUNT);}
-    this._extraCards.forEach((card) => this._renderCard(this.__extraCardsListComponent, card));
+  _renderExtraCardsList(extraListType, extraFilmCards) {
+    const extraCardsListElement = new ExtraView(extraListType);
+    render(this._filmsComponent, extraCardsListElement, RenderPosition.BEFOREEND);
+    const extraCardsListComponent = new FilmsListView();
+    render(extraCardsListElement, extraCardsListComponent, RenderPosition.BEFOREEND);
+    extraFilmCards.forEach((card) => this._renderCard(extraCardsListComponent, card));
   }
 
   _renderMovie() {
@@ -175,7 +189,7 @@ export default class Movie {
     this._renderSort();
     this._renderMenu(this._cardList);
     this._renderCardsList();
-    this._renderExtraCardsList(FilmsExtraList.TOP_RATED);
-    this._renderExtraCardsList(FilmsExtraList.MOST_COMMENTED);
+    this._renderExtraCardsList(FilmsExtraList.TOP_RATED, this._cardList.slice().sort((element1, element2) => element2.filmInfo.totalRating - element1.filmInfo.totalRating).splice(0, EXTRA_MOVIE_COUNT));
+    this._renderExtraCardsList(FilmsExtraList.MOST_COMMENTED, this._cardList.slice().sort((element1, element2) => element2.comments.length - element1.comments.length).splice(0, EXTRA_MOVIE_COUNT));
   }
 }

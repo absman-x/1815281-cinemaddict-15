@@ -29,3 +29,17 @@ export const humanizeDate = (date) => dayjs(date).format('DD MMMM YYYY');
 
 export const convertToHoursDuration = (date) => dayjs.duration(date, 'minutes').hours();
 export const convertToMinutesDuration = (date) => dayjs.duration(date, 'minutes').minutes();
+
+export const updateItem = (items, update) => {
+  const index = items.findIndex((item) => item.id === update.id);
+
+  if (index === -1) {
+    return items;
+  }
+
+  return [
+    ...items.slice(0, index),
+    update,
+    ...items.slice(index + 1),
+  ];
+};
