@@ -9,7 +9,8 @@ import CardPresenter from './film-card.js';
 import {updateItem} from '../utils/common.js';
 import {render, RenderPosition, remove} from '../utils/render.js';
 import { sortDate, sortRating, sortComments} from '../utils/card.js';
-import {SortType} from '../const.js';
+import { SortType } from '../const.js';
+import { generateComment } from '../mock/comment-mock.js';
 
 const MOVIE_COUNT_PER_STEP = 5;
 const EXTRA_MOVIE_COUNT = 2;
@@ -118,7 +119,8 @@ export default class Movie {
 
   _renderCard(presenter, container, card) {
     const cardPresenter = new CardPresenter(container, this._handleCardChange, this._handleModeChange);
-    cardPresenter.init(card);
+    const comments = (card.comments).map((id) => generateComment(id));
+    cardPresenter.init(card, comments);
     presenter.set(card.id, cardPresenter);
   }
 

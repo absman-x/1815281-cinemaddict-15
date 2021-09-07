@@ -1,4 +1,4 @@
-import AbstractView from './abstract.js';
+import SmartView from './smart.js';
 import { humanizeDate, convertToHoursDuration, convertToMinutesDuration, formatDateForComment } from '../utils/common.js';
 
 const createPopupTemplate = (card, comments) => {
@@ -142,19 +142,27 @@ const createPopupTemplate = (card, comments) => {
           </section>`;
 };
 
-export default class Popup extends AbstractView {
+export default class Popup extends SmartView {
   constructor(card, comments) {
     super();
-    this._card = card;
+    this._data = Popup.parseCardToData(card);
     this._comments = comments;
     this._closePopupClickHandler = this._closePopupClickHandler.bind(this);
     this._watchlistPopupClickHandler = this._watchlistPopupClickHandler.bind(this);
     this._historyPopupClickHandler = this._historyPopupClickHandler.bind(this);
     this._favoritePopupClickHandler = this._favoritePopupClickHandler.bind(this);
+    this._setInnerHandlers();
+    //this._setEmoteInputHandler = this._setEmoteInputHandler.bind(this);
+    this._emoteListClickHandler = this._emoteListClickHandler.bind(this);
+
   }
 
   getTemplate() {
-    return createPopupTemplate(this._card, this._comments);
+    return createPopupTemplate(this._data, this._comments);
+  }
+
+  _getScrollTop() {
+    return this.getElement().scrollTop;
   }
 
   _closePopupClickHandler(evt) {
@@ -195,5 +203,55 @@ export default class Popup extends AbstractView {
   setFavoritePopupClickHandler(callback) {
     this._callback.favoritePopupClick = callback;
     this.getElement().querySelector('.film-details__control-button--favorite').addEventListener('click', this._favoritePopupClickHandler);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+  }
+
+  _setEmoteInputHandler() {
+    this.getElement().querySelectorAll('.film-details__emoji-item').forEach((it) => it.addEventListener('input', this._emoteListClickHandler));
+  }
+
+  _setInnerHandlers() {
+    this._setEmoteInputHandler();
+    this.setClosePopupHandler(this._callback.closePopupClick);
+    this.setFavoritePopupClickHandler(this._callback.favoritePopupClick);
+    this.setHistoryPopupClickHandler(this._callback.historyPopupClick);
+    this.setWatchlistPopupClickHandler(this._callback.watchlistPopupClick);
+  }
+
+  _emoteListClickHandler(evt) {
+    evt.preventDefault();
+    console.log(this);
+    evt.preventDefault();
+    const scrollTop = this.getScrollTop();
+
+    const comment = this.getElement().querySelector('.film-details__comment-input').value;
+    this.updateData({
+      emoji: evt.target.value,
+      commentText: comment,
+    }, false);
+    this.scrollByTop(scrollTop);
+  }
+
+  /*static parseCardToData(card) {
+    return Object.assign(
+      {},
+      card,
+      {
+
+      },
+    );
+  }*/
+
+  static parseCardToData(card) {
+    return Object.assign({}, card);
+  }
+
+  static parseDataToCard(card) {
+    card = Object.assign({}, card);
+
+    return card;
   }
 }

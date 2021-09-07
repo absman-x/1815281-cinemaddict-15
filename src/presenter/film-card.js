@@ -2,7 +2,6 @@ import CardView from '../view/card.js';
 import PopupView from '../view/popup.js';
 import { checkEscEvent } from '../utils/common.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
-import { generateComment } from '../mock/comment-mock.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -28,19 +27,23 @@ export default class Card {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(card) {
+  init(card, comments) {
     this._card = card;
     const prevCardComponent = this._cardComponent;
     const prevPopupComponent = this._popupComponent;
 
     this._cardComponent = new CardView(card);
-    this._popupComments = (this._card.comments).map((id) => generateComment(id));
+    //this._popupComments = (this._card.comments).map((id) => generateComment(id));
+    if (comments !== undefined) {
+      this._popupComments = comments;
+    }
     this._popupComponent = new PopupView(this._card, this._popupComments);
 
     this._cardComponent.setOpenPopupHandler(this._handleOpenPopupClick);//this._handleEditClick);
     this._cardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._cardComponent.setWatchlistClickHandler(this._handleWatchlistClick);//this._handleArchiveClick
     this._cardComponent.setHistoryClickHandler(this._handleHistoryClick);
+
 
     if (prevCardComponent === null || prevPopupComponent === null) {
       render(this._cardListContainer, this._cardComponent, RenderPosition.BEFOREEND);
@@ -75,7 +78,7 @@ export default class Card {
   }
 
   _escKeyDownHandler(evt) {
-    if (checkEscEvent) {
+    if (checkEscEvent(evt)) {
       evt.preventDefault();
       this._handleClosePopupClick();
     }
