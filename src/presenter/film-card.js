@@ -60,6 +60,7 @@ export default class Card {
     }
 
     remove(prevCardComponent);
+    remove(prevPopupComponent);
   }
 
   destroy() {
@@ -80,6 +81,7 @@ export default class Card {
   _escKeyDownHandler(evt) {
     if (checkEscEvent(evt)) {
       evt.preventDefault();
+      this._popupComponent.resetPopup(this._card);
       this._handleClosePopupClick();
     }
   }
