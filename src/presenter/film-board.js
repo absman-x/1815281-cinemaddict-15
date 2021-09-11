@@ -1,12 +1,13 @@
 import FilmsView from '../view/films.js';
 import MenuView from '../view/menu.js';
 import SortView from '../view/sort.js';
+import PopupView from '../view/popup.js';
 import FilmsListView from '../view/films-list.js';
 import NoFilmsView from '../view/no-films.js';
 import ExtraView from '../view/films-extra.js';
 import ShowMoreButtonView from '../view/show-more-button.js';
 import CardPresenter from './film-card.js';
-import {updateItem} from '../utils/common.js';
+import {checkEscEvent, updateItem} from '../utils/common.js';
 import {render, RenderPosition, remove} from '../utils/render.js';
 import { sortDate, sortRating, sortComments} from '../utils/card.js';
 import { SortType } from '../const.js';
@@ -28,6 +29,8 @@ export default class Movie {
     this._extraTopRatedPresenter = new Map();
     this._extraMostCommentedPresenter = new Map();
     this._currentSortType = SortType.DEFAULT;
+    this._openedPopup = null;
+    this._openedCard = null;
 
     this._filmsComponent = new FilmsView();
     this._sortComponent = new SortView();
@@ -36,9 +39,12 @@ export default class Movie {
     this._showMoreButtonComponent = new ShowMoreButtonView();
 
     this._handleCardChange = this._handleCardChange.bind(this);
-    this._handleModeChange = this._handleModeChange.bind(this);
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+
+    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    this._closePopup = this._closePopup.bind(this);
+    this._openPopup = this._openPopup.bind(this);
   }
 
   init(cardList) {
@@ -53,12 +59,6 @@ export default class Movie {
     render(this._noFilmsComponent, this._filmsListComponent, RenderPosition.BEFOREEND);
 
     this._renderMovie();
-  }
-
-  _handleModeChange() {
-    this._cardPresenter.forEach((presenter) => presenter.resetView());
-    this._extraTopRatedPresenter.forEach((presenter) => presenter.resetView());
-    this._extraMostCommentedPresenter.forEach((presenter) => presenter.resetView());
   }
 
   _handleCardChange(updatedCard) {
@@ -87,8 +87,6 @@ export default class Movie {
         this._cardList.sort(sortRating);
         break;
       default:
-        // 3. А когда пользователь захочет "вернуть всё, как было",
-        // мы просто запишем в _cardList исходный массив
         this._cardList = this._sourcedCardList.slice();
     }
 
@@ -107,6 +105,10 @@ export default class Movie {
       return;
     }
 
+    if (this._openedPopup) {
+      this._closePopup();
+    }
+
     this._sortCards(sortType);
     this._clearCardList();
     this._renderCardList();
@@ -117,8 +119,43 @@ export default class Movie {
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
+  _escKeyDownHandler(evt) {
+    if (checkEscEvent(evt)) {
+      evt.preventDefault();
+      this._closePopup();
+    }
+  }
+
+  _closePopup() {
+    remove(this._openedPopup);
+    document.body.classList.remove('hide-overflow');
+    document.removeEventListener('keydown', this._escKeyDownHandler);
+    this._openedPopup = null;
+  }
+
+  _openPopup(card) {
+    return () => {
+      if (card === this._openedCard) {
+        return;
+      }
+      if (this._openedPopup) {
+        this._closePopup();
+      }
+      const cardComments = (card.comments).map((id) => generateComment(id));
+      const popupCard = Object.assign({}, card, {cardComments});
+      const popup = new PopupView(popupCard, this._handleCardChange);
+      document.body.appendChild(popup.getElement());
+      document.body.classList.add('hide-overflow');
+      popup.setClosePopupHandler(this._closePopup);
+
+      this._openedCard = card;
+      this._openedPopup = popup;
+      document.addEventListener('keydown', this._escKeyDownHandler);
+    };
+  }
+
   _renderCard(presenter, container, card) {
-    const cardPresenter = new CardPresenter(container, this._handleCardChange, this._handleModeChange);
+    const cardPresenter = new CardPresenter(container, this._handleCardChange, this._openPopup);
     const comments = (card.comments).map((id) => generateComment(id));
     cardPresenter.init(card, comments);
     presenter.set(card.id, cardPresenter);
@@ -165,7 +202,6 @@ export default class Movie {
   }
 
   _renderMenu(cardList) {
-    // Метод для рендеринга сортировки
     this._cardList = cardList.slice();
     this._menuComponent = new MenuView(this._cardList);
     render(this._movieContainer, this._menuComponent, RenderPosition.AFTERBEGIN);

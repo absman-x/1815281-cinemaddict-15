@@ -29,7 +29,7 @@ const createPopupTemplate = (card, comments) => {
     const formattedCommentDate = formatDateForComment(comment.date);
     return `<li class="film-details__comment">
               <span class="film-details__comment-emoji">
-                <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji - ${comment.emotion} ">
+                <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji-${comment.emotion}">
               </span>
               <div>
                 <p class="film-details__comment-text">${comment.comment}</p>
@@ -44,7 +44,7 @@ const createPopupTemplate = (card, comments) => {
   const commentsClassName = comments.map((comment) => generateCommentsClassNameElement(comment));
 
   const isCheckedEmote = (emote) => (emote === emoji ? 'checked' : '');
-
+  //debugger;
   return `<section class="film-details">
             <form class="film-details__inner" action="" method="get">
               <div class="film-details__top-container">
@@ -145,16 +145,18 @@ const createPopupTemplate = (card, comments) => {
 };
 
 export default class Popup extends SmartView {
-  constructor(card, comments) {
+  constructor(card, changeData) {
     super();
-    this._data = Popup.parseCardToData(card);
-    this._comments = comments;
+    this._data = card;
+    this._comments = card.cardComments;
+    this._changeData = changeData;
     this._closePopupClickHandler = this._closePopupClickHandler.bind(this);
     this._watchlistPopupClickHandler = this._watchlistPopupClickHandler.bind(this);
     this._historyPopupClickHandler = this._historyPopupClickHandler.bind(this);
     this._favoritePopupClickHandler = this._favoritePopupClickHandler.bind(this);
-    //this._setEmoteInputHandler = this._setEmoteInputHandler.bind(this);
+
     this._emoteListClickHandler = this._emoteListClickHandler.bind(this);
+    this._newCommentTextHandler = this._newCommentTextHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -163,23 +165,16 @@ export default class Popup extends SmartView {
     return createPopupTemplate(this._data, this._comments);
   }
 
-  resetPopup(card) {
-    this.updateData(
-      Popup.parseCardToData(card),
-    );
-  }
-
   _getScrollTop() {
     return this.getElement().scrollTop;
   }
 
   _setScrollByTop(scrollTopValue) {
-    return this.getElement().scrollTop = scrollTopValue;
+    this.getElement().scrollBy(0, scrollTopValue, 0);
   }
 
   _closePopupClickHandler(evt) {
     evt.preventDefault();
-    //this.resetPopup(this.card);
     this._callback.closePopupClick();
   }
 
@@ -192,95 +187,100 @@ export default class Popup extends SmartView {
   _watchlistPopupClickHandler(evt) {
     evt.preventDefault();
     const scrollTop = this._getScrollTop();
+    this._changeData(
+      Object.assign(
+        {},
+        this._data,
+        { isInWatchlist: !this._data.isInWatchlist },
+      ),
+    );
     this.updateData({
       isInWatchlist: !this._data.isInWatchlist,
     }, false);
     this._setScrollByTop(scrollTop);
-    this._callback.watchlistPopupClick();
   }
 
-  setWatchlistPopupClickHandler(callback) {
-    this._callback.watchlistPopupClick = callback;
+  setWatchlistPopupClickHandler() {
     this.getElement().querySelector('.film-details__control-button--watchlist').addEventListener('click', this._watchlistPopupClickHandler);
   }
 
   _historyPopupClickHandler(evt) {
     evt.preventDefault();
     const scrollTop = this._getScrollTop();
+    this._changeData(
+      Object.assign(
+        {},
+        this._data,
+        { isAlreadyWatched: !this._data.isAlreadyWatched },
+      ),
+    );
     this.updateData({
       isAlreadyWatched: !this._data.isAlreadyWatched,
     }, false);
     this._setScrollByTop(scrollTop);
-    this._callback.historyPopupClick();
   }
 
-  setHistoryPopupClickHandler(callback) {
-    this._callback.historyPopupClick = callback;
+  setHistoryPopupClickHandler() {
     this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._historyPopupClickHandler);
   }
 
   _favoritePopupClickHandler(evt) {
     evt.preventDefault();
     const scrollTop = this._getScrollTop();
+    this._changeData(
+      Object.assign(
+        {},
+        this._data,
+        {isFavorite: !this._data.isFavorite},
+      ),
+    );
     this.updateData({
       isFavorite: !this._data.isFavorite,
     }, false);
     this._setScrollByTop(scrollTop);
-    this._callback.favoritePopupClick();
   }
 
-  setFavoritePopupClickHandler(callback) {
-    this._callback.favoritePopupClick = callback;
+  setFavoritePopupClickHandler() {
     this.getElement().querySelector('.film-details__control-button--favorite').addEventListener('click', this._favoritePopupClickHandler);
-  }
-
-  restoreHandlers() {
-    this._setInnerHandlers();
   }
 
   _setEmoteInputHandler() {
     this.getElement().querySelectorAll('.film-details__emoji-item').forEach((it) => it.addEventListener('input', this._emoteListClickHandler));
   }
 
+  _setAddCommentHandler() {
+    this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._newCommentTextHandler);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+  }
+
   _setInnerHandlers() {
     this._setEmoteInputHandler();
+    this._setAddCommentHandler();
     this.setClosePopupHandler(this._callback.closePopupClick);
-    this.setFavoritePopupClickHandler(this._callback.favoritePopupClick);
-    this.setHistoryPopupClickHandler(this._callback.historyPopupClick);
-    this.setWatchlistPopupClickHandler(this._callback.watchlistPopupClick);
+    this.setFavoritePopupClickHandler();
+    this.setHistoryPopupClickHandler();
+    this.setWatchlistPopupClickHandler();
   }
 
   _emoteListClickHandler(evt) {
     evt.preventDefault();
     const scrollTop = this._getScrollTop();
-    console.log(evt.target);
-    const comment = this.getElement().querySelector('.film-details__comment-input').value;
     this.updateData({
       emoji: evt.target.value,
-      commentText: comment,
     }, false);
-
-    //this.getElement().scrollTop = scrollTop;
     this._setScrollByTop(scrollTop);
   }
 
-  /*static parseCardToData(card) {
-    return Object.assign(
-      {},
-      card,
-      {
+  _newCommentTextHandler(evt) {
+    evt.preventDefault();
+    const scrollTop = this._getScrollTop();
+    this.updateData({
+      commentText: evt.target.value,
+    }, true);
 
-      },
-    );
-  }*/
-
-  static parseCardToData(card) {
-    return Object.assign({}, card);
-  }
-
-  static parseDataToCard(card) {
-    card = Object.assign({}, this._data);
-    //console.log(card);
-    return card;
+    this._setScrollByTop(scrollTop);
   }
 }

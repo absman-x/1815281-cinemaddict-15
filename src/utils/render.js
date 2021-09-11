@@ -31,10 +31,17 @@ export const createElement = (template) => {
   return newElement.firstChild;
 };
 
-export const remove = (element) => {
-  //проверка на instanceOf ?
-  element.getElement().remove();
-  element.removeElement();
+export const remove = (component) => {
+  if (component === null) {
+    return;
+  }
+
+  if (!(component instanceof Abstract)) {
+    throw new Error('Can remove only components');
+  }
+
+  component.getElement().remove();
+  component.removeElement();
 };
 
 export const replace = (newChild, oldChild) => {
