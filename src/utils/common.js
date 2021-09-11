@@ -1,10 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
-import relativeTime from 'dayjs/plugin/relativeTime';
-dayjs.extend(relativeTime);
-import isToday from 'dayjs/plugin/isToday';
-dayjs.extend(isToday);
 
 export const getRandomInteger = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -19,9 +15,7 @@ export const getRandomUniqueItems = (items, count) => {
   return uniqueItems;
 };
 
-export const formatDateForComment = (date) => dayjs(date).isToday()
-  ? 'Today'
-  : dayjs(date).fromNow();
+export const formatDateForComment = (date) => dayjs(date).format('YYYY/MM/DD HH:mm');
 
 export const checkEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
