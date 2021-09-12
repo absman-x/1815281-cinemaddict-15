@@ -131,6 +131,7 @@ export default class Movie {
     document.body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this._openedPopup = null;
+    this._openedCard = null;
   }
 
   _openPopup(card) {
