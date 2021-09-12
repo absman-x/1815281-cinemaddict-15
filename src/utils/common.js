@@ -15,9 +15,9 @@ export const getRandomUniqueItems = (items, count) => {
   return uniqueItems;
 };
 
-export const formatDateForComment = (date) => dayjs(date).format('YYYY/MM/DD HH:mm');
-
 export const checkEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
+
+export const formatDateForComment = (date) => dayjs(date).format('YYYY/MM/DD HH:mm');
 
 export const humanizeDate = (date) => dayjs(date).format('DD MMMM YYYY');
 
