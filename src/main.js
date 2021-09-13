@@ -2,17 +2,21 @@ import UserRankView from './view/rank.js';
 import FooterView from './view/footer.js';
 import { render, RenderPosition } from './utils/render.js';
 import { generateCard } from './mock/card-mock.js';
+import CardsModel from './model/films-model.js';
 import MoviePresenter from './presenter/film-board.js';
 
 const MAIN_MOVIE_COUNT = 12;
 
 const cardList = new Array(MAIN_MOVIE_COUNT).fill().map(generateCard);
 
+const cardsModel = new CardsModel();
+cardsModel.setCards(cardList);
+
 const siteMainElement = document.querySelector('.main');
 const siteHeaderElement = document.querySelector('.header');
 const siteFooterElement = document.querySelector('.footer__statistics');
 
-const moviePresenter = new MoviePresenter(siteMainElement);
+const moviePresenter = new MoviePresenter(siteMainElement, cardsModel);
 
 render(siteHeaderElement, new UserRankView(), RenderPosition.BEFOREEND);
 //render(siteMainElement, new MenuView(cardList), RenderPosition.BEFOREEND);
@@ -20,4 +24,4 @@ render(siteHeaderElement, new UserRankView(), RenderPosition.BEFOREEND);
 //renderFilms(siteMainElement, cardList);
 render(siteFooterElement, new FooterView(cardList), RenderPosition.BEFOREEND);
 
-moviePresenter.init(cardList);
+moviePresenter.init();

@@ -1,4 +1,5 @@
 import SmartView from './smart.js';
+import { UserAction, UpdateType } from '../const.js';
 import { humanizeDate, convertToHoursDuration, convertToMinutesDuration, formatDateForComment } from '../utils/common.js';
 
 const createPopupTemplate = (card, comments) => {
@@ -188,6 +189,8 @@ export default class Popup extends SmartView {
     evt.preventDefault();
     const scrollTop = this._getScrollTop();
     this._changeData(
+      UserAction.UPDATE_CARD,
+      UpdateType.MINOR,
       Object.assign(
         {},
         this._data,
@@ -208,6 +211,8 @@ export default class Popup extends SmartView {
     evt.preventDefault();
     const scrollTop = this._getScrollTop();
     this._changeData(
+      UserAction.UPDATE_CARD,
+      UpdateType.MINOR,
       Object.assign(
         {},
         this._data,
@@ -228,6 +233,8 @@ export default class Popup extends SmartView {
     evt.preventDefault();
     const scrollTop = this._getScrollTop();
     this._changeData(
+      UserAction.UPDATE_CARD,
+      UpdateType.MINOR,
       Object.assign(
         {},
         this._data,

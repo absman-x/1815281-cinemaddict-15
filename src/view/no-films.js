@@ -48,9 +48,7 @@ const createNoFilmsTemplate = (filter) => {
       titleClass = 'visually-hidden';
   }
 
-  return `<section class="films-list">
-    <h2 class="films-list__title ${titleClass}">${titleText}</h2>
-  </section>`;
+  return `<h2 class="films-list__title ${titleClass}">${titleText}</h2>`;
 };
 
 export default class NoFilms extends AbstractView {
