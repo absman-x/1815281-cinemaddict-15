@@ -1,4 +1,5 @@
 import CardView from '../view/card.js';
+import { UserAction, UpdateType } from '../const.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 
 export default class Card {
@@ -39,6 +40,8 @@ export default class Card {
 
   _handleFavoriteClick() {
     this._changeData(
+      UserAction.UPDATE_CARD,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._card,
@@ -51,6 +54,8 @@ export default class Card {
 
   _handleWatchlistClick() {
     this._changeData(
+      UserAction.UPDATE_CARD,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._card,
@@ -63,6 +68,8 @@ export default class Card {
 
   _handleHistoryClick() {
     this._changeData(
+      UserAction.UPDATE_CARD,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._card,

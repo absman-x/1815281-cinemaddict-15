@@ -40,7 +40,7 @@ const commentNumber = () => getRandomInteger(1, 50);
 const generateReleaseDate = () => (generateDate(10000));
 
 export const generateCard = () => {
-  const commentsList = new Array(getRandomInteger(1, MAX_COMMENTS_COUNT)).fill().map(commentNumber);
+  const commentsList = [...new Set(new Array(getRandomInteger(1, MAX_COMMENTS_COUNT)).fill().map(commentNumber))];
   const filmTitle = generateSingleData(FILM_TITLES);
 
   return {

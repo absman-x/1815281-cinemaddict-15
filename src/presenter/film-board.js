@@ -31,7 +31,7 @@ export default class Movie {
     this._extraMostCommentedPresenter = new Map();
     this._currentSortType = SortType.DEFAULT;
     this._openedPopup = null;
-    this._openedCard = null;
+    this._openedCardId = null;
     this._sortComponent = null;
     this._showMoreButtonComponent = null;
 
@@ -110,6 +110,9 @@ export default class Movie {
         if (this._extraMostCommentedPresenter.has(updatedCard.id)) {
           this._extraMostCommentedPresenter.get(updatedCard.id).init(updatedCard);
         }
+        // if (updatedCard.id === this._openedCardId) {
+        //   this._openPopup(updatedCard);
+        // }
         break;
       case UpdateType.MINOR:
         this._clearMovieBoard();
@@ -161,12 +164,12 @@ export default class Movie {
     document.body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this._escKeyDownHandler);
     this._openedPopup = null;
-    this._openedCard = null;
+    this._openedCardId = null;
   }
 
   _openPopup(card) {
     return () => {
-      if (card === this._openedCard) {
+      if (card.id === this._openedCardId) {
         return;
       }
       if (this._openedPopup) {
@@ -179,7 +182,7 @@ export default class Movie {
       document.body.classList.add('hide-overflow');
       popup.setClosePopupHandler(this._closePopup);
 
-      this._openedCard = card;
+      this._openedCardId = card.id;
       this._openedPopup = popup;
       document.addEventListener('keydown', this._escKeyDownHandler);
     };

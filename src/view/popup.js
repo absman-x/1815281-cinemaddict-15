@@ -190,7 +190,7 @@ export default class Popup extends SmartView {
     const scrollTop = this._getScrollTop();
     this._changeData(
       UserAction.UPDATE_CARD,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._data,
@@ -212,7 +212,7 @@ export default class Popup extends SmartView {
     const scrollTop = this._getScrollTop();
     this._changeData(
       UserAction.UPDATE_CARD,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._data,
@@ -234,7 +234,7 @@ export default class Popup extends SmartView {
     const scrollTop = this._getScrollTop();
     this._changeData(
       UserAction.UPDATE_CARD,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       Object.assign(
         {},
         this._data,
