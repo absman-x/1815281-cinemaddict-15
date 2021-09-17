@@ -207,7 +207,7 @@ export default class Popup extends SmartView {
     const scrollTop = this._getScrollTop();
     this._changeData(
       UserAction.UPDATE_CARD,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       Object.assign(
         {},
         this._data,
@@ -229,7 +229,7 @@ export default class Popup extends SmartView {
     const scrollTop = this._getScrollTop();
     this._changeData(
       UserAction.UPDATE_CARD,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       Object.assign(
         {},
         this._data,
@@ -251,7 +251,7 @@ export default class Popup extends SmartView {
     const scrollTop = this._getScrollTop();
     this._changeData(
       UserAction.UPDATE_CARD,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       Object.assign(
         {},
         this._data,
@@ -301,7 +301,7 @@ export default class Popup extends SmartView {
     const commentId = parseInt(evt.target.dataset.commentId, 10);
     this._changeData(
       UserAction.DELETE_COMMENT,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       this._data,
       commentId,
     );
@@ -360,7 +360,7 @@ export default class Popup extends SmartView {
 
       this._changeData(
         UserAction.ADD_COMMENT,
-        UpdateType.PATCH,
+        UpdateType.MINOR,
         this._data,
         commentId,
       );

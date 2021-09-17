@@ -110,7 +110,7 @@ export default class Movie {
         }
         break;
       case UpdateType.MINOR:
-        this._clearMovieBoard();
+        this._clearMovieBoard({ resetRenderedCardCount: true });
         this._renderMovie();
         break;
       case UpdateType.MAJOR:
@@ -270,11 +270,11 @@ export default class Movie {
     render(this._movieContainer, this._menuComponent, RenderPosition.AFTERBEGIN);
   }
 
-  _renderExtraCardsList(presenter, extraCardsListElement, extraListType, sortType) {
+  _renderExtraCardsList(presenter, extraCardsListElement, sortType) {
     render(this._filmsComponent, extraCardsListElement, RenderPosition.BEFOREEND);
     const extraCardsListComponent = new FilmsListContainerView();
     render(extraCardsListElement, extraCardsListComponent, RenderPosition.BEFOREEND);
-    this._getCards().
+    this._cardsModel.getCards().
       slice().
       sort(sortType).
       splice(0, EXTRA_MOVIE_COUNT).
@@ -301,7 +301,7 @@ export default class Movie {
       this._renderShowMoreButton();
     }
 
-    this._renderExtraCardsList(this._extraTopRatedPresenter, this._extraTopRatedComponent, FilmsExtraList.TOP_RATED, sortRating);
-    this._renderExtraCardsList(this._extraMostCommentedPresenter, this._extraMostCommentedComponent, FilmsExtraList.MOST_COMMENTED, sortComments);
+    this._renderExtraCardsList(this._extraTopRatedPresenter, this._extraTopRatedComponent, sortRating);
+    this._renderExtraCardsList(this._extraMostCommentedPresenter, this._extraMostCommentedComponent, sortComments);
   }
 }
