@@ -1,65 +1,54 @@
 import AbstractView from './abstract.js';
+import { FilterType } from '../const.js';
 
-const FILTERS = {
-  ALL_MOVIES: 'All movies',
-  WATCHLIST: 'Watchlist',
-  HISTORY: 'History',
-  FAVORITES: 'Favorites',
+const NoCardsTextType = {
+  [FilterType.ALL]: 'There are no movies in our database',
+  [FilterType.WATCHLIST]: 'There are no movies to watch now',
+  [FilterType.HISTORY]: 'There are no watched movies now',
+  [FilterType.FAVORITES]: 'There are no favorite movies now',
 };
 
-const allMoviesFilter = {
-  text: 'There are no movies in our database',
-};
+const createNoFilmsTemplate = (filterType, noCards) => {
+  const noCardTextValue = NoCardsTextType[filterType];
 
-const watchlistFilter = {
-  text: 'There are no movies to watch now',
-};
+  let titleText = 'All movies. Upcoming';
+  let titleClass = 'visually-hidden';
 
-const historyFilter = {
-  text: 'There are no watched movies now',
-};
-
-const favoritesFilter = {
-  text: 'There are no favorite movies now',
-};
-
-const createNoFilmsTemplate = (filter) => {
-  let titleText;
-  let titleClass;
-  switch (filter) {
-    case (FILTERS.ALL_MOVIES):
-      titleText = allMoviesFilter.text;
-      titleClass ='';
-      break;
-    case (FILTERS.WATCHLIST):
-      titleText = watchlistFilter.text;
-      titleClass = '';
-      break;
-    case (FILTERS.HISTORY):
-      titleText = historyFilter.text;
-      titleClass = '';
-      break;
-    case (FILTERS.FAVORITES):
-      titleText = favoritesFilter.text;
-      titleClass = '';
-      break;
-    default:
-      titleText = 'All movies. Upcoming';
-      titleClass = 'visually-hidden';
+  if (noCards) {
+    switch (filterType) {
+      case (FilterType.ALL):
+        titleText = noCardTextValue;
+        titleClass ='';
+        break;
+      case (FilterType.WATCHLIST):
+        titleText = noCardTextValue;
+        titleClass = '';
+        break;
+      case (FilterType.HISTORY):
+        titleText = noCardTextValue;
+        titleClass = '';
+        break;
+      case (FilterType.FAVORITES):
+        titleText = noCardTextValue;
+        titleClass = '';
+        break;
+      default:
+        titleText = 'All movies. Upcoming';
+        titleClass = 'visually-hidden';
+    }
   }
 
-  return `<section class="films-list">
-    <h2 class="films-list__title ${titleClass}">${titleText}</h2>
-  </section>`;
+  return `<h2 class="films-list__title ${titleClass}">${titleText}</h2>`;
 };
 
 export default class NoFilms extends AbstractView {
-  constructor(filter) {
+  constructor(filter, noCards) {
     super();
+    this._noCards = noCards;
     this._filter = filter;
   }
 
   getTemplate() {
-    return createNoFilmsTemplate(this._filter);
+    return createNoFilmsTemplate(this._filter, this._noCards);
   }
 }
