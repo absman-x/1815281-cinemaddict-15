@@ -1,5 +1,4 @@
 import { FilterType } from '../const';
-//import { isTaskExpired, isTaskExpiringToday, isTaskRepeating } from './task';
 
 export const filter = {
   [FilterType.ALL]: (cards) => cards.slice(),

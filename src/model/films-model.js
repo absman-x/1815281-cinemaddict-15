@@ -10,8 +10,8 @@ export default class Cards extends AbstractObserver {
     this._cards = cards.slice();
   }
 
-  setComments(comments) {
-    this._comments = comments.slice();
+  setComments(cards) {
+    this._comments = cards.comments.slice();
   }
 
   getCards() {
@@ -34,27 +34,25 @@ export default class Cards extends AbstractObserver {
     this._notify(updateType, update);
   }
 
-  addComment(updateType, update) {
-    this._comments = [
-      update,
-      ...this._comments,
+  addComment(updateType, update, comment) {
+    update.comments = [
+      comment,
+      ...update.comments,
     ];
 
-    this._notify(updateType, update);
+    this.updateCard(updateType, update);
   }
 
-  deleteComment(updateType, update) {
-    const index = this._cards.findIndex((comment) => comment.id === update.id);
-
+  deleteComment(updateType, update, comment) {
+    const index = update.comments.findIndex((it) => it === comment);
     if (index === -1) {
       throw new Error('Can\'t delete unexisting comment');
     }
 
-    this._comments = [
-      ...this._comments.slice(0, index),
-      ...this._comments.slice(index + 1),
+    update.comments = [
+      ...update.comments.slice(0, index),
+      ...update.comments.slice(index + 1),
     ];
-
-    this._notify(updateType);
+    this.updateCard(updateType, update);
   }
 }

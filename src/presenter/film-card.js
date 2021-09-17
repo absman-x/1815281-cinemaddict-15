@@ -39,6 +39,9 @@ export default class Card {
   }
 
   _handleFavoriteClick() {
+    if (document.body.classList.contains('hide-overflow')) {
+      return;
+    }
     this._changeData(
       UserAction.UPDATE_CARD,
       UpdateType.PATCH,
@@ -53,6 +56,9 @@ export default class Card {
   }
 
   _handleWatchlistClick() {
+    if (document.body.classList.contains('hide-overflow')) {
+      return;
+    }
     this._changeData(
       UserAction.UPDATE_CARD,
       UpdateType.PATCH,
@@ -67,6 +73,9 @@ export default class Card {
   }
 
   _handleHistoryClick() {
+    if (document.body.classList.contains('hide-overflow')) {
+      return;
+    }
     this._changeData(
       UserAction.UPDATE_CARD,
       UpdateType.PATCH,
