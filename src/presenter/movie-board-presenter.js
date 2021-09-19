@@ -1,5 +1,4 @@
 import FilmsView from '../view/films.js';
-import MenuView from '../view/menu.js';
 import SortView from '../view/sort.js';
 import PopupView from '../view/popup.js';
 import FilmsListView from '../view/films-list.js';
@@ -7,13 +6,13 @@ import FilmsListContainerView from '../view/films-list-container.js';
 import NoFilmsView from '../view/no-films.js';
 import ExtraView from '../view/films-extra.js';
 import ShowMoreButtonView from '../view/show-more-button.js';
-import CardPresenter from './film-card.js';
+import CardPresenter from './card-presenter.js';
 import {checkEscEvent} from '../utils/common.js';
 import {render, RenderPosition, remove} from '../utils/render.js';
-import { sortDate, sortRating, sortComments} from '../utils/card.js';
-import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
-import { generateComment } from '../mock/comment-mock.js';
-import { filter } from '../utils/filter.js';
+import {sortDate, sortRating, sortComments} from '../utils/card.js';
+import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
+import {generateComment } from '../mock/comment-mock.js';
+import {filter} from '../utils/filter.js';
 
 const MOVIE_COUNT_PER_STEP = 5;
 const EXTRA_MOVIE_COUNT = 2;
@@ -65,12 +64,31 @@ export default class Movie {
     this._cardsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
 
-    this._renderMovie();
+    this._renderMovieBoard();
+  }
+
+  destroy() {
+    this._clearMovieBoard({ resetRenderedTaskCount: true, resetSortType: true });
+
+    remove(this._filmsComponent);
+    remove(this._filmsListComponent);
+    remove(this._filmsListContainerComponent);
+    remove(this._extraTopRatedComponent);
+    remove(this._extraMostCommentedComponent);
+
+    this._cardsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
   }
 
   _getCards() {
     this._filterType = this._filterModel.getFilter();
     const cards = this._cardsModel.getCards();
+    if (!this._filterType) {
+      this._filterType = 'all';
+    }
+    if (this._filterType === 'stats') {
+      this._filterType = 'all';
+    }
     const filtredCards = filter[this._filterType](cards);
 
     switch (this._currentSortType) {
@@ -111,11 +129,11 @@ export default class Movie {
         break;
       case UpdateType.MINOR:
         this._clearMovieBoard({ resetRenderedCardCount: true });
-        this._renderMovie();
+        this._renderMovieBoard();
         break;
       case UpdateType.MAJOR:
         this._clearMovieBoard({ resetRenderedCardCount: true, resetSortType: true });
-        this._renderMovie();
+        this._renderMovieBoard();
         break;
     }
   }
@@ -131,7 +149,7 @@ export default class Movie {
 
     this._currentSortType = sortType;
     this._clearMovieBoard({ resetRenderedCardCount: true });
-    this._renderMovie();
+    this._renderMovieBoard();
   }
 
   _escKeyDownHandler(evt) {
@@ -265,11 +283,6 @@ export default class Movie {
     }
   }
 
-  _renderMenu() {
-    this._menuComponent = new MenuView(this._getCards().slice());
-    render(this._movieContainer, this._menuComponent, RenderPosition.AFTERBEGIN);
-  }
-
   _renderExtraCardsList(presenter, extraCardsListElement, sortType) {
     render(this._filmsComponent, extraCardsListElement, RenderPosition.BEFOREEND);
     const extraCardsListComponent = new FilmsListContainerView();
@@ -281,7 +294,7 @@ export default class Movie {
       forEach((card) => this._renderCard(presenter, extraCardsListComponent, card));
   }
 
-  _renderMovie() {
+  _renderMovieBoard() {
     const cards = this._getCards();
     const cardCount = cards.length;
 

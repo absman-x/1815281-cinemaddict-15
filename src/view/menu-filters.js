@@ -1,8 +1,9 @@
 import AbstractView from './abstract.js';
-import { FilterType } from '../const.js';
+import { FilterType, MenuItem } from '../const.js';
 
 const createFilterItemTemplate = (filter, currentFilterType) => {
   const { type, name, count } = filter;
+
   return (
     `<a href="#${type}"
     class="main-navigation__item
@@ -31,12 +32,21 @@ export default class Menu extends AbstractView {
     super();
     this._filters = filters;
     this._currentFilter = currentFilterType;
-
+    this._isStatsOpened = null;
     this._filterTypeChangeHandler = this._filterTypeChangeHandler.bind(this);
+    this._siteMenuItemChangeHandler = this._siteMenuItemChangeHandler.bind(this);
   }
 
   getTemplate() {
-    return createMenuTemplate(this._filters, this._currentFilter);
+    return createMenuTemplate(this._filters, this._currentFilter, this._isStatsOpened);
+  }
+
+  _isStatsOpened(currentMenuItem) {
+    return currentMenuItem === MenuItem.STATISTICS;
+  }
+
+  _getHrefData(data) {
+    return data.target.href.split('#').pop();
   }
 
   _filterTypeChangeHandler(evt) {
@@ -44,11 +54,25 @@ export default class Menu extends AbstractView {
     if (evt.target.tagName !== 'A') {
       return;
     }
-    this._callback.filterTypeChange(evt.target.href.split('#').pop());
+    this._callback.filterTypeChange(this._getHrefData(evt));
+  }
+
+  _siteMenuItemChangeHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.tagName !== 'A') {
+      return;
+    }
+    const menuItemValue = this._getHrefData(evt) !== 'stats' ? MenuItem.MOVIES : MenuItem.STATISTICS;
+    this._callback.siteMenuItemChange(menuItemValue);
   }
 
   setFilterTypeChangeHandler(callback) {
     this._callback.filterTypeChange = callback;
     this.getElement().addEventListener('click', this._filterTypeChangeHandler);
+  }
+
+  setSiteMenuItemChangeHandler(callback) {
+    this._callback.siteMenuItemChange = callback;
+    this.getElement().addEventListener('click',this._siteMenuItemChangeHandler);
   }
 }
