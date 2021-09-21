@@ -42,13 +42,28 @@ export default class Cards extends AbstractObserver {
   }
 
   addComment(updateType, update) {
-    this._comments = update.comments;
-
-    this._notify(updateType);
+    this._notify(updateType, update);
   }
 
-  deleteComment(updateType) {
-    this._notify(updateType);
+  deleteComment(updateType, update) {
+    const cardIndex = this._cards.findIndex((card) => card.id === update.id);
+
+    if (cardIndex === -1) {
+      throw new Error('Can\'t update unexisting card');
+    }
+
+    const updatedCard = this._cards[cardIndex];
+    const cardCommentIndex = updatedCard.comments.findIndex((comment) => parseInt(comment, 10) === update.commentId);
+
+    if (cardCommentIndex === -1) {
+      throw new Error('Can\'t update unexisting comment');
+    }
+
+    updatedCard.comments = [
+      ...updatedCard.comments.slice(0, cardCommentIndex),
+      ...updatedCard.comments.slice(cardCommentIndex + 1),
+    ];
+    this._notify(updateType, updatedCard);
   }
 
   static adaptToClient(card) {

@@ -149,6 +149,7 @@ const createPopupTemplate = (card, comments) => {
 export default class Popup extends SmartView {
   constructor(card, changeData, cardComments) {
     super();
+    this._offset;
     this._data = card;
     this._comments = cardComments;
     this._changeData = changeData;
@@ -171,6 +172,14 @@ export default class Popup extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
+  }
+
+  setOffset(offset) {
+    this._offset = offset;
+  }
+
+  getOffset() {
+    return this._offset;
   }
 
   _setInnerHandlers() {
@@ -303,11 +312,9 @@ export default class Popup extends SmartView {
       this._changeData(
         UserAction.DELETE_COMMENT,
         UpdateType.MINOR,
-        commentId,
+        { id: this._data.id, commentId },
       );
     }
-    //this._deleteComment(commentId);
-    //this.updateComments(this._comments, false);
     this._setScrollByTop(scrollTop);
   }
 
@@ -333,8 +340,6 @@ export default class Popup extends SmartView {
   }
 
   _deleteComment(deletedComment) {
-    console.log(this._comments);
-    console.log(deletedComment);
     const index = this._comments.findIndex((comment) => parseInt(comment.id, 10) === deletedComment);
 
     if (index === -1) {
@@ -354,7 +359,6 @@ export default class Popup extends SmartView {
       }
       evt.preventDefault();
       const scrollTop = this._getScrollTop();
-      //const commentId = 33;
 
       this.updateData({
         commentText: '',
@@ -372,18 +376,8 @@ export default class Popup extends SmartView {
       this._changeData(
         UserAction.ADD_COMMENT,
         UpdateType.MINOR,
-        //this._data,
         dataComment,
       );
-
-      // this._comments = [
-      //   dataComment,
-      //   ...this._comments,
-      // ];
-      // this.updateComments(this._comments, false);
-
-      // this._commentText = '';
-      // this._emoji = null;
 
       this._setScrollByTop(scrollTop);
     }

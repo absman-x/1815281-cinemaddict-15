@@ -1,3 +1,4 @@
+import UserRankView from '../view/rank.js';
 import FilmsView from '../view/films.js';
 import SortView from '../view/sort.js';
 import PopupView from '../view/popup.js';
@@ -12,7 +13,6 @@ import {checkEscEvent} from '../utils/common.js';
 import {render, RenderPosition, remove} from '../utils/render.js';
 import {sortDate, sortRating, sortComments} from '../utils/card.js';
 import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
-//import {generateComment } from '../mock/comment-mock.js';
 import {filter} from '../utils/filter.js';
 
 const MOVIE_COUNT_PER_STEP = 5;
@@ -24,10 +24,11 @@ const FilmsExtraList = {
 };
 
 export default class Movie {
-  constructor(movieContainer, cardsModel, filterModel, api) {
+  constructor(movieContainer, siteHeaderContainer, cardsModel, filterModel, api) {
     this._cardsModel = cardsModel;
     this._filterModel = filterModel;
     this._movieContainer = movieContainer;
+    this._headerContainer = siteHeaderContainer;
     this._api = api;
     this._renderedCardsCount = MOVIE_COUNT_PER_STEP;
     this._cardPresenter = new Map();
@@ -37,7 +38,6 @@ export default class Movie {
     this._filterType = FilterType.ALL;
     this._noCards = false;
     this._openedPopup = null;
-    // this._cardComments = [];
     this._openedCardId = null;
     this._sortComponent = null;
     this._showMoreButtonComponent = null;
@@ -89,10 +89,10 @@ export default class Movie {
     this._filterType = this._filterModel.getFilter();
     const cards = this._cardsModel.getCards();
     if (!this._filterType) {
-      this._filterType = 'all';
+      this._filterType = FilterType.ALL;
     }
     if (this._filterType === 'stats') {
-      this._filterType = 'all';
+      this._filterType = FilterType.ALL;
     }
     const filtredCards = filter[this._filterType](cards);
 
@@ -106,24 +106,20 @@ export default class Movie {
   }
 
   _handleViewAction(actionType, updateType, update) {
-    console.log(update);
     switch (actionType) {
       case UserAction.UPDATE_CARD:
-        //this._cardsModel.updateCard(updateType, update);
         this._api.updateCard(update).then((response) => {
           this._cardsModel.updateCard(updateType, response);
         });
         break;
       case UserAction.ADD_COMMENT:
-        //this._cardsModel.addComment(updateType, update, comment);
         this._api
           .addComment(update)
           .then((response) => {
-            this._cardsModel.addComment(updateType, response);
+            this._cardsModel.updateCard(updateType, response);
           });
         break;
       case UserAction.DELETE_COMMENT:
-        //this._cardsModel.deleteComment(updateType, update, comment);
         this._api
           .deleteComment(update)
           .then(() => {
@@ -150,7 +146,6 @@ export default class Movie {
         }
         break;
       case UpdateType.MINOR:
-        //debugger;
         this._clearMovieBoard();
         this._renderMovieBoard();
         break;
@@ -162,6 +157,9 @@ export default class Movie {
         this._isLoading = false;
         remove(this._loadingComponent);
         this._renderMovieBoard();
+    }
+    if (this._openedPopup) {
+      this._openPopup(updatedCard)();
     }
   }
 
@@ -198,9 +196,7 @@ export default class Movie {
     return () => {
       this._api.getComments(card).then((comments) => {
         this._cardsModel.setComments(comments);
-        if (card.id === this._openedCardId) {
-          return;
-        }
+
         if (this._openedPopup) {
           this._closePopup();
         }
@@ -218,8 +214,7 @@ export default class Movie {
 
   _renderCard(presenter, container, card) {
     const cardPresenter = new CardPresenter(container, this._handleViewAction, this._openPopup);
-    //const comments = (card.comments).map((id) => generateComment(id));
-    cardPresenter.init(card); //, comments);
+    cardPresenter.init(card);
     presenter.set(card.id, cardPresenter);
   }
 
@@ -288,6 +283,7 @@ export default class Movie {
     remove(this._noFilmsComponent);
     remove(this._showMoreButtonComponent);
     remove(this._extraTopRatedComponent);
+    remove(this._profileRankComponent);
     remove(this._extraMostCommentedComponent);
 
     if (cardsCount < this._renderedCardsCount) {
@@ -331,6 +327,18 @@ export default class Movie {
     return this._cardsModel.getCards();
   }
 
+  _renderProfileRank(cards) {
+    if (!this._profileRankComponent === null) {
+      this._profileRankComponent = null;
+    }
+    this._profileRankComponent = new UserRankView(cards);
+    render(
+      this._headerContainer,
+      this._profileRankComponent,
+      RenderPosition.BEFOREEND,
+    );
+  }
+
   _renderLoading() {
     render(
       this._filmsListComponent,
@@ -345,7 +353,7 @@ export default class Movie {
       return;
     }
 
-    //const allCards = this._getAllCards();
+    const allCards = this._getAllCards();
     const cards = this._getCards();
     const cardsCount = cards.length;
 
@@ -358,7 +366,7 @@ export default class Movie {
     render(this._filmsListComponent, this._filmsListContainerComponent, RenderPosition.BEFOREEND);
 
     this._renderSort();
-
+    this._renderProfileRank(allCards);
     this._renderCards(cards.slice(0, Math.min(cardsCount, this._renderedCardsCount)));
 
     if (cardsCount > this._renderedCardsCount) {

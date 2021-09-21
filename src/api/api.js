@@ -45,12 +45,13 @@ export default class Api {
       method: Method.POST,
       body: JSON.stringify(commentData.localComment),
       headers: new Headers({ 'Content-Type': 'application/json' }),
-    }).then(Api.toJSON);
+    }).then(Api.toJSON)
+      .then((response) => CardsModel.adaptToClient(response.movie));
   }
 
-  deleteComment(commentId) {
+  deleteComment(comment) {
     return this._load({
-      url: `comments/${commentId}`,
+      url: `comments/${comment.commentId}`,
       method: Method.DELETE,
       headers: new Headers({ 'Content-Type': 'application/json' }),
     });
