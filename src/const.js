@@ -30,6 +30,7 @@ export const FilterType = {
   WATCHLIST: 'watchlist',
   HISTORY: 'history',
   FAVORITES: 'favorites',
+  STATISTICS: 'stats',
 };
 
 export const MenuItem = {

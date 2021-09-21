@@ -12,7 +12,7 @@ import CardPresenter from './card-presenter.js';
 import {checkEscEvent} from '../utils/common.js';
 import {render, RenderPosition, remove} from '../utils/render.js';
 import {sortDate, sortRating, sortComments} from '../utils/card.js';
-import {SortType, UpdateType, UserAction, FilterType} from '../const.js';
+import {SortType, UpdateType, UserAction, FilterType, State} from '../const.js';
 import {filter} from '../utils/filter.js';
 
 const MOVIE_COUNT_PER_STEP = 5;
@@ -91,7 +91,7 @@ export default class Movie {
     if (!this._filterType) {
       this._filterType = FilterType.ALL;
     }
-    if (this._filterType === 'stats') {
+    if (this._filterType === FilterType.STATISTICS) {
       this._filterType = FilterType.ALL;
     }
     const filtredCards = filter[this._filterType](cards);
@@ -103,6 +103,32 @@ export default class Movie {
         return filtredCards.sort(sortRating);
     }
     return filtredCards;
+  }
+
+  _setViewState(state, update) {
+    if (!this._openedCardId) {
+      return;
+    }
+
+    switch (state) {
+      case State.ADDING:
+        this._openedPopup.updateData({
+          isAdding: true,
+        });
+        break;
+      case State.DELETING:
+        this._openedPopup.updateData({
+          isDeleting: true,
+          deletingId: update,
+        });
+        break;
+      case State.ABORTING_DELETING:
+        this._openedPopup.shakeDelete(update);
+        break;
+      case State.ABORTING_ADDING:
+        this._openedPopup.shakeAdd({ resetState: true });
+        break;
+    }
   }
 
   _handleViewAction(actionType, updateType, update) {
@@ -117,17 +143,21 @@ export default class Movie {
           .addComment(update)
           .then((response) => {
             this._cardsModel.updateCard(updateType, response);
+          })
+          .catch(() => {
+            this._setViewState(State.ABORTING_ADDING);
           });
         break;
       case UserAction.DELETE_COMMENT:
+        this._setViewState(State.DELETING, update);
         this._api
           .deleteComment(update)
           .then(() => {
             this._cardsModel.deleteComment(updateType, update);
+          })
+          .catch(() => {
+            this._setViewState(State.ABORTING_DELETING, update);
           });
-        // .catch(() => {
-        //   this._setViewState(State.ABORTING_DELETING, update);
-        // });
         break;
     }
   }

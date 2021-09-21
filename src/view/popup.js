@@ -3,8 +3,10 @@ import he from 'he';
 import { UserAction, UpdateType } from '../const.js';
 import { humanizeDate, convertToHoursDuration, convertToMinutesDuration, formatDateForComment } from '../utils/common.js';
 
+const SHAKE_ANIMATION_TIMEOUT = 1000;
+
 const createPopupTemplate = (card, comments) => {
-  const { title, alternativeTitle, ageRating, totalRating, director, description, releaseDate, releaseCountry, writers, actors, genre, poster, runtime, isAlreadyWatched, isFavorite, isInWatchlist, emoji, commentText } = card;
+  const { title, alternativeTitle, ageRating, totalRating, director, description, releaseDate, releaseCountry, writers, actors, genre, poster, runtime, isAlreadyWatched, isFavorite, isInWatchlist, emoji, commentText, isDeleting, isAdding, deletingId } = card;
   const commentsNumbers = card.comments;
   const runTime = `${convertToHoursDuration(runtime)}h ${convertToMinutesDuration(runtime)}m`;
 
@@ -39,7 +41,8 @@ const createPopupTemplate = (card, comments) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${comment.author}</span>
           <span class="film-details__comment-day">${formattedCommentDate}</span>
-          <button class="film-details__comment-delete" data-comment-id="${comment.id}">Delete</button>
+          <button class="film-details__comment-delete" data-comment-id="${comment.id}" ${isDeleting ? 'disabled=\'disabled\' style=\'opacity: 0.5;\'' : ''}>
+        ${isDeleting && deletingId === comment.id ? 'Deleting...' : 'Delete'}</button>
         </p>
       </div>
     </li>`;
@@ -119,22 +122,22 @@ const createPopupTemplate = (card, comments) => {
                   <div class="film-details__new-comment">
                     <div class="film-details__add-emoji-label">${emoji !== undefined ? `<img src="./images/emoji/${emoji}.png" width="55" height="55" alt="emoji-${emoji}">` : ''}</div>
                     <label class="film-details__comment-label">
-                      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${commentText !== undefined ? `${he.encode(commentText)}` : ''}</textarea>
+                      <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${isAdding ? 'disabled=\'disabled\' style=\'opacity: 0.5;\'' : ''}>${commentText !== undefined ? `${he.encode(commentText)}` : ''}</textarea>
                     </label>
                     <div class="film-details__emoji-list">
-                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile" ${isCheckedEmote('smile')}>
+                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile" ${isCheckedEmote('smile')} ${isAdding ? 'disabled=\'disabled\'' : ''}>
                         <label class="film-details__emoji-label" for="emoji-smile">
                           <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
                         </label>
-                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping" ${isCheckedEmote('sleeping')}>
+                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping" ${isCheckedEmote('sleeping')} ${isAdding ? 'disabled=\'disabled\'' : ''}>
                         <label class="film-details__emoji-label" for="emoji-sleeping">
                           <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
                         </label>
-                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke" ${isCheckedEmote('puke')}>
+                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke" ${isCheckedEmote('puke')} ${isAdding ? 'disabled=\'disabled\'' : ''}>
                         <label class="film-details__emoji-label" for="emoji-puke">
                           <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
                         </label>
-                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry" ${isCheckedEmote('angry')}>
+                      <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry" ${isCheckedEmote('angry')} ${isAdding ? 'disabled=\'disabled\'' : ''}>
                         <label class="film-details__emoji-label" for="emoji-angry">
                           <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
                         </label>
@@ -387,5 +390,18 @@ export default class Popup extends SmartView {
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector('.film-details__inner').addEventListener('keydown', this._newCommentSubmitHandler);
+  }
+
+  shakeAdd({ resetState = false } = {}) {
+    const posTop = this.getElement().scrollTop;
+    const element = document.querySelector('.film-details__new-comment');
+    element.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    setTimeout(() => {
+      element.style.animation = '';
+      if (resetState) {
+        this._resetFormState();
+      }
+      this.getElement().scrollTop = posTop;
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 }
