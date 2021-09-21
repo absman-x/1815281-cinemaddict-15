@@ -3,7 +3,7 @@ import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { convertToHoursDuration, convertToMinutesDuration } from '../utils/common.js';
 import {
-  getProfileRating,
+  getProfileRank,
   getWatchedMoviesCount,
   getTotalDuration,
   getRatingGenre,
@@ -93,7 +93,7 @@ const renderChart = (statisticCtx, data) => {
 };
 
 const generateStatisticTamplate = (data, movies) => {
-  const profileRating = getProfileRating(movies);
+  const profileRating = getProfileRank(movies);
   const watchedMoviesCount = getWatchedMoviesCount(data.movies);
   const totalDuration = getTotalDuration(data.movies);
   const ratingGenre = getRatingGenre(data.movies);

@@ -14,6 +14,15 @@ export const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
+};
+
+export const State = {
+  ADDING: 'ADDING',
+  DELETING: 'DELETING',
+  ABORTING: 'ABORTING',
+  ABORTING_DELETING: 'ABORTING_DELETING',
+  ABORTING_ADDING: 'ABORTING_ADDING',
 };
 
 export const FilterType = {

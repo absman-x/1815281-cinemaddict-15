@@ -149,6 +149,7 @@ const createPopupTemplate = (card, comments) => {
 export default class Popup extends SmartView {
   constructor(card, changeData, cardComments) {
     super();
+    this._offset;
     this._data = card;
     this._comments = cardComments;
     this._changeData = changeData;
@@ -160,13 +161,36 @@ export default class Popup extends SmartView {
     this._emoteListClickHandler = this._emoteListClickHandler.bind(this);
     this._newCommentTextHandler = this._newCommentTextHandler.bind(this);
 
-    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._newCommentSubmitHandler = this._newCommentSubmitHandler.bind(this);
     this._commentsDeleteClickHandler = this._commentsDeleteClickHandler.bind(this);
     this._setInnerHandlers();
   }
 
   getTemplate() {
     return createPopupTemplate(this._data, this._comments);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+  }
+
+  setOffset(offset) {
+    this._offset = offset;
+  }
+
+  getOffset() {
+    return this._offset;
+  }
+
+  _setInnerHandlers() {
+    this._setCommentDeleteHandler();
+    this._setEmoteInputHandler();
+    this._setAddCommentHandler();
+    this.setFormSubmitHandler();
+    this.setClosePopupHandler(this._callback.closePopupClick);
+    this.setFavoritePopupClickHandler();
+    this.setHistoryPopupClickHandler();
+    this.setWatchlistPopupClickHandler();
   }
 
   _getScrollTop() {
@@ -280,33 +304,17 @@ export default class Popup extends SmartView {
     this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._newCommentTextHandler);
   }
 
-  restoreHandlers() {
-    this._setInnerHandlers();
-  }
-
-  _setInnerHandlers() {
-    this._setCommentDeleteHandler();
-    this._setEmoteInputHandler();
-    this._setAddCommentHandler();
-    this.setFormSubmitHandler();
-    this.setClosePopupHandler(this._callback.closePopupClick);
-    this.setFavoritePopupClickHandler();
-    this.setHistoryPopupClickHandler();
-    this.setWatchlistPopupClickHandler();
-  }
-
   _commentsDeleteClickHandler(evt) {
     evt.preventDefault();
     const scrollTop = this._getScrollTop();
     const commentId = parseInt(evt.target.dataset.commentId, 10);
-    this._changeData(
-      UserAction.DELETE_COMMENT,
-      UpdateType.MINOR,
-      this._data,
-      commentId,
-    );
-    this._deleteComment(commentId);
-    this.updateComments(this._comments, false);
+    if (commentId) {
+      this._changeData(
+        UserAction.DELETE_COMMENT,
+        UpdateType.MINOR,
+        { id: this._data.id, commentId },
+      );
+    }
     this._setScrollByTop(scrollTop);
   }
 
@@ -332,10 +340,10 @@ export default class Popup extends SmartView {
   }
 
   _deleteComment(deletedComment) {
-    const index = this._comments.findIndex((comment) => comment.id === deletedComment);
+    const index = this._comments.findIndex((comment) => parseInt(comment.id, 10) === deletedComment);
 
     if (index === -1) {
-      throw new Error('Can\'t delete unexisting task');
+      throw new Error('Can\'t delete unexisting comment');
     }
 
     this._comments = [
@@ -344,43 +352,32 @@ export default class Popup extends SmartView {
     ];
   }
 
-  _formSubmitHandler(evt) {
+  _newCommentSubmitHandler(evt) {
     if (evt.key === 'Enter' && (evt.metaKey || evt.ctrlKey)) {
-      if (!(this._emoji) || !(this._commentText)) {
+      if (!this._emoji || !this._commentText) {
         return;
       }
       evt.preventDefault();
       const scrollTop = this._getScrollTop();
-      const commentId = 33;
 
       this.updateData({
         commentText: '',
         emoji: undefined,
       }, false);
 
+      const dataComment = {
+        cardId: this._data.id,
+        localComment: {
+          emotion: this._emoji,
+          comment: this._commentText,
+        },
+      };
+
       this._changeData(
         UserAction.ADD_COMMENT,
         UpdateType.MINOR,
-        this._data,
-        commentId,
-      );
-
-      const dataComment = {
-        id: commentId,
-        emotion: this._emoji,
-        date: '2021/09/15 13:51',
-        author: 'THE NAME',
-        comment: this._commentText,
-      };
-
-      this._comments = [
         dataComment,
-        ...this._comments,
-      ];
-      this.updateComments(this._comments, false);
-
-      this._commentText = '';
-      this._emoji = null;
+      );
 
       this._setScrollByTop(scrollTop);
     }
@@ -389,6 +386,6 @@ export default class Popup extends SmartView {
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
-    this.getElement().querySelector('.film-details__inner').addEventListener('keydown', this._formSubmitHandler);
+    this.getElement().querySelector('.film-details__inner').addEventListener('keydown', this._newCommentSubmitHandler);
   }
 }
